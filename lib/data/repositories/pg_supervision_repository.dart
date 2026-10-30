@@ -12,6 +12,13 @@ class PgSupervisionRepository {
           .watchSingleOrNull()
           .map((row) => row?.students ?? 0);
 
+  Future<int> students(String academicYearLabel) async =>
+      (await (_db.select(_db.pgSupervision)
+                ..where((p) => p.academicYearLabel.equals(academicYearLabel)))
+              .getSingleOrNull())
+          ?.students ??
+      0;
+
   Future<void> setStudents(String academicYearLabel, int students) => _db
       .into(_db.pgSupervision)
       .insertOnConflictUpdate(

@@ -49,6 +49,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   Future<void> _otherWorkSheet(OtherWorkRow work, String category) async {
     final delete = await showModalBottomSheet<bool>(
       context: context,
+      // Above the bottom bar, not inside the tab.
+      useRootNavigator: true,
       showDragHandle: true,
       builder: (context) => SafeArea(
         child: Padding(

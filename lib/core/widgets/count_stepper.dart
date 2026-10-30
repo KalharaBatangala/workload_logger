@@ -37,39 +37,14 @@ class CountStepper extends StatelessWidget {
   }
 
   Future<void> _type(BuildContext context) async {
-    final controller = TextEditingController(
-      text: value > 0 ? formatCount(value) : '',
-    );
     final typed = await showDialog<double>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(label),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          keyboardType: TextInputType.numberWithOptions(decimal: step < 1),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(
-              RegExp(step < 1 ? r'[0-9.]' : r'[0-9]'),
-            ),
-          ],
-          onSubmitted: (text) =>
-              Navigator.pop(context, double.tryParse(text) ?? 0),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () =>
-                Navigator.pop(context, double.tryParse(controller.text) ?? 0),
-            child: const Text('OK'),
-          ),
-        ],
+      builder: (context) => _TypeNumberDialog(
+        label: label,
+        initial: value > 0 ? formatCount(value) : '',
+        decimals: step < 1,
       ),
     );
-    controller.dispose();
     if (typed != null) onChanged(_clamp(typed));
   }
 
@@ -229,6 +204,63 @@ class _QuickChip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Typing a number. Owns its text controller, so it is disposed only once
+/// the dialog has finished closing.
+class _TypeNumberDialog extends StatefulWidget {
+  const _TypeNumberDialog({
+    required this.label,
+    required this.initial,
+    required this.decimals,
+  });
+
+  final String label;
+  final String initial;
+  final bool decimals;
+
+  @override
+  State<_TypeNumberDialog> createState() => _TypeNumberDialogState();
+}
+
+class _TypeNumberDialogState extends State<_TypeNumberDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initial,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() =>
+      Navigator.pop(context, double.tryParse(_controller.text) ?? 0);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.label),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        keyboardType: TextInputType.numberWithOptions(decimal: widget.decimals),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(
+            RegExp(widget.decimals ? r'[0-9.]' : r'[0-9]'),
+          ),
+        ],
+        onSubmitted: (_) => _submit(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(onPressed: _submit, child: const Text('OK')),
+      ],
     );
   }
 }

@@ -17,6 +17,7 @@ import '../features/onboarding/screens/pick_name_screen.dart';
 import '../features/onboarding/screens/reminder_time_screen.dart';
 import '../features/onboarding/screens/welcome_screen.dart';
 import '../features/setup/screens/setup_screen.dart';
+import '../features/summary/screens/role_row_detail_screen.dart';
 import '../features/summary/screens/summary_screen.dart';
 import '../features/today/screens/today_screen.dart';
 import 'widgets/app_scaffold.dart';
@@ -32,6 +33,7 @@ abstract final class AppRoutes {
   static String logDetails(String code) => '/log/m/$code/details';
   static const logSaved = '/log/saved';
   static const logOther = '/log/other';
+  static String summaryRow(int roleRowId) => '/summary/row/$roleRowId';
   static String logLecture(String code, int roleRowId) =>
       '/log/m/$code/lecture/$roleRowId';
   static String editEntry(String id) => '/edit/$id';
@@ -96,7 +98,18 @@ GoRouter createRouter({
         branches: [
           _branch(AppRoutes.today, const TodayScreen()),
           _branch(AppRoutes.history, const HistoryScreen()),
-          _branch(AppRoutes.summary, const SummaryScreen()),
+          _branch(
+            AppRoutes.summary,
+            const SummaryScreen(),
+            routes: [
+              GoRoute(
+                path: 'row/:id',
+                builder: (context, state) => RoleRowDetailScreen(
+                  roleRowId: int.parse(state.pathParameters['id']!),
+                ),
+              ),
+            ],
+          ),
           _branch(AppRoutes.setup, const SetupScreen()),
         ],
       ),
@@ -204,8 +217,14 @@ GoRouter createRouter({
   );
 }
 
-StatefulShellBranch _branch(String path, Widget screen) {
+StatefulShellBranch _branch(
+  String path,
+  Widget screen, {
+  List<RouteBase> routes = const [],
+}) {
   return StatefulShellBranch(
-    routes: [GoRoute(path: path, builder: (context, state) => screen)],
+    routes: [
+      GoRoute(path: path, builder: (context, state) => screen, routes: routes),
+    ],
   );
 }

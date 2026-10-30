@@ -27,6 +27,16 @@ class PhotosRepository {
         ),
       );
 
+  /// Number of photos per entry, for the evidence log.
+  Future<Map<String, int>> countsByEntry() async {
+    final rows = await _db.select(_db.entryPhotos).get();
+    final counts = <String, int>{};
+    for (final row in rows) {
+      counts.update(row.entryId, (n) => n + 1, ifAbsent: () => 1);
+    }
+    return counts;
+  }
+
   Future<void> remove(int id) =>
       (_db.delete(_db.entryPhotos)..where((p) => p.id.equals(id))).go();
 }

@@ -25,7 +25,7 @@ void main() {
 
     for (final (label, marker) in [
       ('History', 'All entries'),
-      ('Summary', 'Summary arrives in M7.'),
+      ('Summary', 'Your role rows'),
       ('Setup', 'Setup arrives in M8.'),
       ('Today', 'Logged today'),
     ]) {

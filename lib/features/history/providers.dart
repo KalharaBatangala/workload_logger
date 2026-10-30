@@ -13,15 +13,6 @@ final historyOtherWorkProvider = StreamProvider.autoDispose<List<OtherWorkRow>>(
   (ref) => ref.watch(otherWorkRepositoryProvider).watchRange(),
 );
 
-/// All role rows, including ones a newer workbook no longer has, so old
-/// entries keep their module (SPEC §7.2).
-final allRoleRowsProvider = StreamProvider.autoDispose<Map<int, RoleRow>>(
-  (ref) => ref
-      .watch(roleRowsRepositoryProvider)
-      .watchAll()
-      .map((rows) => {for (final r in rows) r.id: r}),
-);
-
 final otherCategoryNamesProvider = StreamProvider.autoDispose<Map<int, String>>(
   (ref) => ref
       .watch(otherWorkRepositoryProvider)

@@ -63,11 +63,11 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] Edit sheet + delete with undo snackbar; locked periods read-only
 
 ### M7 · Summary and export
-- [ ] Period selector, hero, category bars, zero chips, role-row list + detail (SPEC §8.7)
-- [ ] Export `.xlsx` with 4 sheets (SPEC §7.3) via share sheet
-- [ ] Evidence-log export
-- [ ] Close period (lock)
-- [ ] Test: exported My Data_Entry rows reproduce the fixture hours
+- [x] Period selector, hero, category bars, zero chips, role-row list + detail (SPEC §8.7)
+- [x] Export `.xlsx` with 4 sheets (SPEC §7.3) via share sheet
+- [x] Evidence-log export
+- [x] Close period (lock)
+- [x] Test: exported My Data_Entry rows reproduce the fixture hours
 
 ### M8 · Setup, timetable and reminders
 - [ ] Setup screen sections (SPEC §8.8): workload file, rates view, timetable CRUD, reminders,

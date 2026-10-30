@@ -119,12 +119,21 @@ class EntriesRepository {
 
   /// Non-deleted entries from [from] (inclusive; null = all) up to [to]
   /// (inclusive; null = open), newest first.
-  Stream<List<EntryRow>> watchRange({String? from, String? to}) => _watch(
-    (e) => Expression.and([
-      if (from != null) e.date.isBiggerOrEqualValue(from),
-      if (to != null) e.date.isSmallerOrEqualValue(to),
-    ]),
-  );
+  Stream<List<EntryRow>> watchRange({String? from, String? to}) =>
+      _watch(_inRange(from, to));
+
+  /// One-off read of [watchRange] (for exports).
+  Future<List<EntryRow>> getRange({String? from, String? to}) =>
+      _query(_inRange(from, to)).get();
+
+  static Expression<bool> Function($EntriesTable e) _inRange(
+    String? from,
+    String? to,
+  ) =>
+      (e) => Expression.and([
+        if (from != null) e.date.isBiggerOrEqualValue(from),
+        if (to != null) e.date.isSmallerOrEqualValue(to),
+      ]);
 
   Stream<List<EntryRow>> watchDrafts() =>
       _watch((e) => e.status.equalsValue(EntryStatus.draft));
@@ -205,12 +214,14 @@ class EntriesRepository {
 
   Stream<List<EntryRow>> _watch(
     Expression<bool> Function($EntriesTable e) filter,
-  ) =>
-      (_db.select(_entries)
-            ..where((e) => e.deletedAt.isNull() & filter(e))
-            ..orderBy([
-              (e) => OrderingTerm.desc(e.date),
-              (e) => OrderingTerm.desc(e.createdAt),
-            ]))
-          .watch();
+  ) => _query(filter).watch();
+
+  SimpleSelectStatement<$EntriesTable, EntryRow> _query(
+    Expression<bool> Function($EntriesTable e) filter,
+  ) => _db.select(_entries)
+    ..where((e) => e.deletedAt.isNull() & filter(e))
+    ..orderBy([
+      (e) => OrderingTerm.desc(e.date),
+      (e) => OrderingTerm.desc(e.createdAt),
+    ]);
 }

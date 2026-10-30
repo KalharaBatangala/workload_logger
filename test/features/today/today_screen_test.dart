@@ -105,7 +105,7 @@ void main() {
   testApp('zero-rows nudge lists 3 rows and opens Summary', (tester) async {
     await pumpApp(tester, demo: true);
     await tapOn(tester, find.text('3 of your role rows are still at zero'));
-    expect(find.text('Summary arrives in M7.'), findsOneWidget);
+    expect(find.text('Your role rows'), findsOneWidget);
   });
 
   testApp('empty state with nothing logged', (tester) async {

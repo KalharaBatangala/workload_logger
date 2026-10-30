@@ -16,18 +16,26 @@ class OtherWorkRepository {
   final Uuid _uuid;
 
   Stream<List<OtherWorkRow>> watchRange({String? from, String? to}) =>
-      (_db.select(_db.otherWork)
-            ..where(
-              (o) => Expression.and([
-                if (from != null) o.date.isBiggerOrEqualValue(from),
-                if (to != null) o.date.isSmallerOrEqualValue(to),
-              ]),
-            )
-            ..orderBy([
-              (o) => OrderingTerm.desc(o.date),
-              (o) => OrderingTerm.desc(o.createdAt),
-            ]))
-          .watch();
+      _range(from, to).watch();
+
+  /// One-off read of [watchRange] (for exports).
+  Future<List<OtherWorkRow>> getRange({String? from, String? to}) =>
+      _range(from, to).get();
+
+  SimpleSelectStatement<$OtherWorkTable, OtherWorkRow> _range(
+    String? from,
+    String? to,
+  ) => _db.select(_db.otherWork)
+    ..where(
+      (o) => Expression.and([
+        if (from != null) o.date.isBiggerOrEqualValue(from),
+        if (to != null) o.date.isSmallerOrEqualValue(to),
+      ]),
+    )
+    ..orderBy([
+      (o) => OrderingTerm.desc(o.date),
+      (o) => OrderingTerm.desc(o.createdAt),
+    ]);
 
   Future<String> add({
     required String date,

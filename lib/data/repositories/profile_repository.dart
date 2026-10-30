@@ -25,6 +25,11 @@ class ProfileRepository {
         const ProfileCompanion(onboardingDone: Value(true)),
       );
 
+  Future<void> setAcademicYearLabel(String label) =>
+      (_db.update(_db.profile)..where((p) => p.id.equals(1))).write(
+        ProfileCompanion(academicYearLabel: Value(label)),
+      );
+
   Future<void> setSubmissionDate(String? date) =>
       (_db.update(_db.profile)..where((p) => p.id.equals(1))).write(
         ProfileCompanion(submissionDate: Value(date)),

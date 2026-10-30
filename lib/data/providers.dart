@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../domain/dates.dart';
 import '../domain/rates.dart';
@@ -17,6 +21,7 @@ import 'repositories/rates_repository.dart';
 import 'repositories/reminder_settings_repository.dart';
 import 'repositories/role_rows_repository.dart';
 import 'repositories/timetable_repository.dart';
+import 'workbook/export_service.dart';
 import 'workbook/import_service.dart';
 
 // ---------------------------------------------------------------------------
@@ -193,4 +198,42 @@ final totalsProvider = FutureProvider<Totals>((ref) async {
 /// The current rates, as a plain value (defaults until the stream delivers).
 final currentRatesProvider = Provider<RateSet>(
   (ref) => ref.watch(rateSetProvider).value ?? RateSet.defaults(),
+);
+
+/// Writes an export to the temporary folder and opens the share sheet.
+/// Tests override this to capture the bytes.
+final exportSinkProvider = Provider<ExportSink>(
+  (ref) => (fileName, bytes) async {
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsBytes(bytes, flush: true);
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [
+          XFile(
+            file.path,
+            mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          ),
+        ],
+        subject: fileName,
+      ),
+    );
+  },
+);
+
+final exportServiceProvider = Provider(
+  (ref) => ExportService(
+    ref.watch(databaseProvider),
+    ref.watch(exportSinkProvider),
+    now: ref.watch(clockProvider),
+  ),
+);
+
+/// All role rows, including ones a newer workbook no longer has, so old
+/// entries keep their module (SPEC §7.2).
+final allRoleRowsProvider = StreamProvider.autoDispose<Map<int, RoleRow>>(
+  (ref) => ref
+      .watch(roleRowsRepositoryProvider)
+      .watchAll()
+      .map((rows) => {for (final r in rows) r.id: r}),
 );

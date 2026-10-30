@@ -66,6 +66,18 @@ class PeriodsRepository {
 
   /// First day of the current academic year: the day after the last closed
   /// period ends, or null (everything) if no period has been closed.
+  /// One-off read of [watchCurrentYearStart].
+  Future<String?> currentYearStart() async {
+    final lastEnd = _db.periods.endDate.max();
+    final end =
+        await (_db.selectOnly(_db.periods)
+              ..addColumns([lastEnd])
+              ..where(_db.periods.lockedAt.isNotNull()))
+            .map((row) => row.read(lastEnd))
+            .getSingle();
+    return end == null ? null : addDays(end, 1);
+  }
+
   Stream<String?> watchCurrentYearStart() {
     final lastEnd = _db.periods.endDate.max();
     final query = _db.selectOnly(_db.periods)
