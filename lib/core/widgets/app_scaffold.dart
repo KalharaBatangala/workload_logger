@@ -121,6 +121,7 @@ class _TabItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = selected ? AppColors.navy : AppColors.navInactive;
     return Semantics(
+      container: true,
       button: true,
       selected: selected,
       label: label,
@@ -170,6 +171,7 @@ class _LogButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final shape = BorderRadius.circular(AppRadii.logButton);
     return Semantics(
+      container: true,
       button: true,
       label: 'Log work',
       excludeSemantics: true,

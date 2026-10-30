@@ -132,6 +132,77 @@ class EntriesRepository {
   Stream<List<EntryRow>> watchForRoleRow(int roleRowId) =>
       _watch((e) => e.roleRowId.equals(roleRowId));
 
+  // Remembered defaults (SPEC §5): read from what was logged before.
+
+  /// Sources that mean "the user logged this" (not imported balances).
+  static const _loggedSources = [
+    EntrySource.manual,
+    EntrySource.timetable,
+    EntrySource.notification,
+    EntrySource.quickText,
+  ];
+
+  Future<EntryRow?> _latest(
+    Expression<bool> Function($EntriesTable e) filter,
+  ) =>
+      (_db.select(_entries)
+            ..where(
+              (e) =>
+                  e.deletedAt.isNull() &
+                  e.source.isInValues(_loggedSources) &
+                  filter(e),
+            )
+            ..orderBy([(e) => OrderingTerm.desc(e.createdAt)])
+            ..limit(1))
+          .getSingleOrNull();
+
+  /// The type last used for (role row, activity), to pre-select it.
+  Future<Subtype?> lastSubtype(int roleRowId, Activity activity) async =>
+      (await _latest(
+        (e) =>
+            e.roleRowId.equals(roleRowId) &
+            e.activity.equalsValue(activity) &
+            e.subtype.isNotNull(),
+      ))?.subtype;
+
+  /// Questions per paper last used for (role row, activity, type).
+  Future<double?> lastQuestionsPerPaper(
+    int roleRowId,
+    Activity activity,
+    Subtype subtype,
+  ) async => (await _latest(
+    (e) =>
+        e.roleRowId.equals(roleRowId) &
+        e.activity.equalsValue(activity) &
+        e.subtype.equalsValue(subtype) &
+        e.questionsPerPaper.isNotNull(),
+  ))?.questionsPerPaper;
+
+  /// The most recent entry among [roleRowIds] (for the "most likely" tile).
+  Future<EntryRow?> lastEntryFor(List<int> roleRowIds) =>
+      _latest((e) => e.roleRowId.isIn(roleRowIds));
+
+  /// Role rows logged most recently first, without repeats.
+  Future<List<int>> recentRoleRowIds({int limit = 3}) async {
+    final rows =
+        await (_db.select(_entries)
+              ..where(
+                (e) =>
+                    e.deletedAt.isNull() &
+                    e.roleRowId.isNotNull() &
+                    e.source.isInValues(_loggedSources),
+              )
+              ..orderBy([(e) => OrderingTerm.desc(e.createdAt)])
+              ..limit(50))
+            .get();
+    final ids = <int>[];
+    for (final row in rows) {
+      if (!ids.contains(row.roleRowId)) ids.add(row.roleRowId!);
+      if (ids.length == limit) break;
+    }
+    return ids;
+  }
+
   Stream<List<EntryRow>> _watch(
     Expression<bool> Function($EntriesTable e) filter,
   ) =>

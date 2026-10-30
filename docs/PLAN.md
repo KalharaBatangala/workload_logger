@@ -42,14 +42,14 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] Test: importing `docs/reference/DEIE_Workload_Model_V10_1.xlsx` gives 8 rows and 78.7 h
 
 ### M4 · Logging flow
-- [ ] StepHeader, ActivityTile, SegmentedChoice, CountStepper, CreditStrip, DateChips widgets
-- [ ] Step 1 Which module (SPEC §8.2), merged codes, batch handling, Other-work entry point
-- [ ] Step 2 What did you do (SPEC §8.3), activities by role/type, role grouping (EC5207)
-- [ ] Step 3 Type + count (SPEC §8.4) with live credit, Qs/paper for marking, date, optional fields, photo
-- [ ] Save / Save as draft; remembered defaults (last subtype, last Qs/paper)
-- [ ] Saved screen (SPEC §8.5) with Done / Log another / Undo
-- [ ] Other-work form (category, time spent, note)
-- [ ] Widget tests: quiz 10 → "+1.0 h"; switching to Structured → "15.0 h"
+- [x] StepHeader, ActivityTile, SegmentedChoice, CountStepper, CreditStrip, DateChips widgets
+- [x] Step 1 Which module (SPEC §8.2), merged codes, batch handling, Other-work entry point
+- [x] Step 2 What did you do (SPEC §8.3), activities by role/type, role grouping (EC5207)
+- [x] Step 3 Type + count (SPEC §8.4) with live credit, Qs/paper for marking, date, optional fields, photo
+- [x] Save / Save as draft; remembered defaults (last subtype, last Qs/paper)
+- [x] Saved screen (SPEC §8.5) with Done / Log another / Undo
+- [x] Other-work form (category, time spent, note)
+- [x] Widget tests: quiz 10 → "+1.0 h"; switching to Structured → "15.0 h"
 
 ### M5 · Today
 - [ ] Greeting, hero card with today / week / year totals (SPEC §8.1)

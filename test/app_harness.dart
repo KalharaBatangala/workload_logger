@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:workload_logger/app.dart';
 import 'package:workload_logger/data/db/app_database.dart';
+import 'package:workload_logger/data/demo_seed.dart';
 import 'package:workload_logger/data/providers.dart';
 
 import 'data/test_database.dart';
@@ -33,16 +34,27 @@ void testApp(String description, Future<void> Function(WidgetTester) body) {
 }
 
 /// Starts the whole app on an in-memory database with the fixed test clock.
-/// With [onboarded], a finished profile exists so the app opens on Today.
+/// With [onboarded], a finished profile exists so the app opens on Today;
+/// with [demo], the demo data is loaded as well (78.7 h + a 1.0 h quiz).
 /// Use inside [testApp].
 Future<AppDatabase> pumpApp(
   WidgetTester tester, {
   bool onboarded = true,
+  bool demo = false,
   List<Override> overrides = const [],
 }) async {
+  // The phone frame of the designs: 390 × 844 logical pixels.
+  tester.view.physicalSize = const Size(390 * 3, 844 * 3);
+  tester.view.devicePixelRatio = 3;
+  addTearDown(tester.view.reset);
+
   final db = openTestDatabase();
   _openDatabases.add(db);
-  if (onboarded) {
+  if (demo) {
+    await DemoSeeder(db, now: () => testNow).seed();
+    await (db.update(db.profile))
+        .write(const ProfileCompanion(onboardingDone: Value(true)));
+  } else if (onboarded) {
     await db
         .into(db.profile)
         .insert(

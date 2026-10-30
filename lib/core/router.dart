@@ -5,7 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../data/db/app_database.dart';
 import '../data/providers.dart';
 import '../features/history/screens/history_screen.dart';
-import '../features/log/screens/log_screen.dart';
+import '../features/log/screens/activity_screen.dart';
+import '../features/log/screens/details_screen.dart';
+import '../features/log/screens/module_screen.dart';
+import '../features/log/screens/other_work_screen.dart';
+import '../features/log/screens/saved_screen.dart';
 import '../features/onboarding/screens/load_workbook_screen.dart';
 import '../features/onboarding/screens/pick_name_screen.dart';
 import '../features/onboarding/screens/reminder_time_screen.dart';
@@ -22,6 +26,10 @@ abstract final class AppRoutes {
   static const summary = '/summary';
   static const setup = '/setup';
   static const log = '/log';
+  static String logModule(String code) => '/log/m/$code';
+  static String logDetails(String code) => '/log/m/$code/details';
+  static const logSaved = '/log/saved';
+  static const logOther = '/log/other';
 
   /// Shown for a moment while the profile loads at start-up.
   static const loading = '/loading';
@@ -92,7 +100,28 @@ GoRouter createRouter({
         path: AppRoutes.log,
         parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) =>
-            const MaterialPage(fullscreenDialog: true, child: LogScreen()),
+            const MaterialPage(fullscreenDialog: true, child: ModuleScreen()),
+        routes: [
+          GoRoute(
+            path: 'm/:code',
+            builder: (context, state) =>
+                ActivityScreen(code: state.pathParameters['code']!),
+            routes: [
+              GoRoute(
+                path: 'details',
+                builder: (context, state) => const DetailsScreen(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'saved',
+            builder: (context, state) => const SavedScreen(),
+          ),
+          GoRoute(
+            path: 'other',
+            builder: (context, state) => const OtherWorkScreen(),
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.loading,

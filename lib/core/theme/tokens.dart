@@ -27,6 +27,10 @@ abstract final class AppColors {
   static const onNavyMuted = Color(0xFFC9D0E0);
   static const success = Color(0xFF2E7D5B);
 
+  // Translucent white on navy (Saved screen cards and outlines).
+  static const onNavyCard = Color(0x14FFFFFF); // 8 %
+  static const onNavyBorder = Color(0x33FFFFFF); // 20 %
+
   // Not in the SPEC palette; Material 3 default error red, for form errors.
   static const error = Color(0xFFB3261E);
 }

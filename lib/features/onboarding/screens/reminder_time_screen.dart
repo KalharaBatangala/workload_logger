@@ -57,6 +57,7 @@ class _ReminderTimeScreenState extends ConsumerState<ReminderTimeScreen> {
           'time is saved now.',
       body: OnboardingCard(
         child: Semantics(
+          container: true,
           button: true,
           label: 'Evening check-in time, ${formatClockTime(time)}. Change',
           excludeSemantics: true,

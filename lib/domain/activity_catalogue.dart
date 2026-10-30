@@ -3,6 +3,7 @@ library;
 
 import 'enums.dart';
 import 'role_row.dart';
+import 'workbook_mapping.dart';
 
 /// An activity offered for a role row, with the subtypes the user picks from.
 class ActivityOption {
@@ -89,3 +90,37 @@ List<ActivityOption> activitiesFor(RoleRowInfo row) {
 /// True for roles whose hours are credited automatically (no logging).
 bool isAutomaticRole(Role role) =>
     role == Role.coordinator || role == Role.moderator;
+
+/// What the count of an entry measures.
+enum CountKind {
+  hours,
+  questions,
+  assessments,
+  papers,
+  students,
+  labs,
+  projects,
+}
+
+/// The unit counted for (activity, subtype); null for activities without a
+/// count (moderation, other work).
+CountKind? countKindFor(Activity activity, Subtype? subtype) =>
+    switch (activity) {
+      Activity.lecture => CountKind.hours,
+      Activity.caPrep || Activity.examPrep =>
+        subtype == Subtype.project
+            ? CountKind.assessments
+            : CountKind.questions,
+      Activity.caMarking || Activity.examMarking =>
+        subtype == Subtype.project ? CountKind.students : CountKind.papers,
+      Activity.secondMarking => CountKind.papers,
+      Activity.labFirstTime => CountKind.labs,
+      Activity.projectSupervision => CountKind.projects,
+      Activity.itEvaluation => CountKind.students,
+      Activity.moderationDone || Activity.other => null,
+    };
+
+/// Whether (activity, subtype) is paper marking, which also needs the number
+/// of questions marked per paper.
+bool needsQuestionsPerPaper(Activity activity, Subtype? subtype) =>
+    columnTargetFor(activity, subtype)?.isPaperMarking ?? false;

@@ -138,6 +138,7 @@ class _NameRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
+      container: true,
       selected: selected,
       button: true,
       child: InkWell(
