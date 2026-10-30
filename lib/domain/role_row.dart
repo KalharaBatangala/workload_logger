@@ -46,8 +46,9 @@ class EntryInput {
   /// Questions, papers, students, labs, projects — or hours for a lecture.
   final double? count;
 
-  /// Paper-based marking only.
-  final int? questionsPerPaper;
+  /// Paper-based marking only. Whole numbers when logged; fractional only for
+  /// opening balances (the workbook stores a weighted average).
+  final double? questionsPerPaper;
 
   /// False for drafts.
   final bool isComplete;

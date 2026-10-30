@@ -10,7 +10,7 @@ import 'fixtures.dart';
 
 Matcher hours(double expected) => closeTo(expected, 1e-9);
 
-EntryInput essayBatch(double papers, int qpp) => EntryInput(
+EntryInput essayBatch(double papers, double qpp) => EntryInput(
   activity: Activity.examMarking,
   subtype: Subtype.essay,
   count: papers,

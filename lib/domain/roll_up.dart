@@ -63,3 +63,23 @@ WorkbookInputs rollUp(Iterable<EntryInput> entries) {
 
   return WorkbookInputs(totals);
 }
+
+/// The inverse of [rollUp]: one complete entry per non-zero count column.
+/// Used to turn values already in the workbook into opening-balance entries.
+///
+/// A paper-marking pair becomes one entry (papers, Qs/paper), so that
+/// `rollUp(inputsToEntries(x)) == x`. A Qs/paper value without papers carries
+/// no hours and is dropped.
+List<EntryInput> inputsToEntries(WorkbookInputs inputs) => [
+  for (final MapEntry(key: (activity, subtype), value: target)
+      in columnTargets.entries)
+    if (inputs[target.count] != 0)
+      EntryInput(
+        activity: activity,
+        subtype: subtype,
+        count: inputs[target.count],
+        questionsPerPaper: target.questionsPerPaper == null
+            ? null
+            : inputs[target.questionsPerPaper!],
+      ),
+];

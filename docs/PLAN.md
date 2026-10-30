@@ -27,12 +27,12 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] Unit tests for every fixture in SPEC §13
 
 ### M2 · Database
-- [ ] Drift tables from SPEC §6, database class, migrations set up (schemaVersion 1)
-- [ ] Repositories: profile, rates, roleRows, entries (+ soft delete/undo), photos, otherWork,
+- [x] Drift tables from SPEC §6, database class, migrations set up (schemaVersion 1)
+- [x] Repositories: profile, rates, roleRows, entries (+ soft delete/undo), photos, otherWork,
       timetable, reminderSettings, dayReviews, pg, periods
-- [ ] Riverpod providers exposing streams (today's entries, totals, drafts…)
-- [ ] Demo seed (SPEC §3.3 rows + opening balances), flagged as demo, removable
-- [ ] Repository tests on an in-memory database
+- [x] Riverpod providers exposing streams (today's entries, totals, drafts…)
+- [x] Demo seed (SPEC §3.3 rows + opening balances), flagged as demo, removable
+- [x] Repository tests on an in-memory database
 
 ### M3 · Workbook import + onboarding
 - [ ] Import service: rates by label (SPEC §3.1), staff list, role rows, PG count, opening balances

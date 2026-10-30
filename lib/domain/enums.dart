@@ -94,3 +94,18 @@ enum Category {
   /// Data_Entry column holding the row total.
   static const totalColumn = 'AU';
 }
+
+/// Whether an entry is finished or still missing information (SPEC §6).
+enum EntryStatus { complete, draft }
+
+/// How an entry was created (SPEC §6).
+enum EntrySource { manual, timetable, notification, quickText, import }
+
+/// Kind of a timetable slot (SPEC §6).
+enum SlotKind { lecture, lab }
+
+/// The four reminders (SPEC §9).
+enum ReminderKind { evening, morning, weekly, submission }
+
+/// The user's answer for a day with nothing logged (SPEC §6).
+enum DayReviewStatus { nothingToLog, reviewed }

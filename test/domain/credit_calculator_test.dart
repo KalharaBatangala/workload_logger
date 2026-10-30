@@ -91,7 +91,7 @@ void main() {
       Activity activity, {
       Subtype? subtype,
       required double count,
-      int? qpp,
+      double? qpp,
     }) => entryCredit(
       EntryInput(
         activity: activity,
