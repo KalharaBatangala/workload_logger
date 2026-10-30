@@ -166,7 +166,12 @@ GoRouter createRouter({
                     : await ref
                           .read(roleRowsRepositoryProvider)
                           .byId(entry.roleRowId!);
-                ref.read(logFlowProvider.notifier).loadEntry(entry, row);
+                final locked = await ref
+                    .read(periodsRepositoryProvider)
+                    .isLocked(entry.date);
+                ref
+                    .read(logFlowProvider.notifier)
+                    .loadEntry(entry, row, readOnly: locked);
                 return true;
               },
             ),

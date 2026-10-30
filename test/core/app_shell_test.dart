@@ -24,7 +24,7 @@ void main() {
     await pumpApp(tester);
 
     for (final (label, marker) in [
-      ('History', 'History arrives in M6.'),
+      ('History', 'All entries'),
       ('Summary', 'Summary arrives in M7.'),
       ('Setup', 'Setup arrives in M8.'),
       ('Today', 'Logged today'),

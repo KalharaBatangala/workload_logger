@@ -88,3 +88,24 @@ Future<void> settle(WidgetTester tester) async {
   }
   await tester.pumpAndSettle();
 }
+
+/// Lists only build what is near the screen, so bring [finder] into the
+/// tree first (scrolling down if needed), then make sure it is visible.
+Future<void> reveal(WidgetTester tester, Finder finder) async {
+  if (finder.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(
+      finder,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+  }
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+}
+
+/// [reveal]s [finder] and taps it.
+Future<void> tapOn(WidgetTester tester, Finder finder) async {
+  await reveal(tester, finder);
+  await tester.tap(finder);
+  await settle(tester);
+}

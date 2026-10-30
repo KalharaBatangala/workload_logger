@@ -68,5 +68,19 @@ String formatDayLabel(String date, {required String today}) {
   final d = DateTime.parse(date);
   final t = DateTime.parse(today);
   if (DateTime(t.year, t.month, t.day - 1) == d) return 'Yesterday';
+  return formatShortDate(date);
+}
+
+/// "Mon 26 Oct" for an ISO date.
+String formatShortDate(String date) {
+  final d = DateTime.parse(date);
   return '${_weekdays[d.weekday - 1]} ${d.day} ${_months[d.month - 1]}';
+}
+
+/// History day headers: "TODAY · THU 29 OCT", "YESTERDAY · WED 28 OCT",
+/// "MON 26 OCT".
+String formatDayHeader(String date, {required String today}) {
+  final label = formatDayLabel(date, today: today);
+  final short = formatShortDate(date);
+  return (label == short ? short : '$label · $short').toUpperCase();
 }

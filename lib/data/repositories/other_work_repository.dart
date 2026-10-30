@@ -56,6 +56,10 @@ class OtherWorkRepository {
   Future<void> remove(String id) =>
       (_db.delete(_db.otherWork)..where((o) => o.id.equals(id))).go();
 
+  /// Puts back a row removed by [remove] (Undo).
+  Future<void> restore(OtherWorkRow row) =>
+      _db.into(_db.otherWork).insertOnConflictUpdate(row);
+
   // Categories
 
   SimpleSelectStatement<$OtherCategoriesTable, OtherCategory> get _categories =>

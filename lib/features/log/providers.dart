@@ -127,6 +127,7 @@ class LogFlowState {
     this.saved,
     this.error,
     this.editingId,
+    this.readOnly = false,
   });
 
   /// `yyyy-MM-dd`.
@@ -160,6 +161,9 @@ class LogFlowState {
   final String? editingId;
 
   bool get isEditing => editingId != null;
+
+  /// True for an entry in a closed period: shown, but cannot be changed.
+  final bool readOnly;
 
   CountKind? get countKind =>
       activity == null ? null : countKindFor(activity!, subtype);
@@ -232,6 +236,7 @@ class LogFlowState {
     saved: saved == _unset ? this.saved : saved as SavedEntry?,
     error: error == _unset ? this.error : error as String?,
     editingId: editingId == _unset ? this.editingId : editingId as String?,
+    readOnly: readOnly,
   );
 }
 
@@ -396,7 +401,7 @@ class LogFlowController extends Notifier<LogFlowState> {
   }
 
   /// Fills the flow from an existing entry so Step 3 can edit it.
-  void loadEntry(EntryRow entry, RoleRow? row) {
+  void loadEntry(EntryRow entry, RoleRow? row, {bool readOnly = false}) {
     final info = row?.toInfo();
     final option = info == null
         ? null
@@ -417,6 +422,7 @@ class LogFlowController extends Notifier<LogFlowState> {
       spentMinutes: entry.spentMinutes,
       note: entry.note ?? '',
       editingId: entry.id,
+      readOnly: readOnly,
     );
   }
 
@@ -451,6 +457,15 @@ class LogFlowController extends Notifier<LogFlowState> {
     if (saved == null) return;
     await ref.read(entriesRepositoryProvider).softDelete(saved.id);
     state = state.copyWith(saved: null);
+  }
+
+  /// Edit mode: deletes the entry being edited (soft delete, so it can be
+  /// undone). Returns its id, or null if nothing was deleted.
+  Future<String?> deleteEditing() async {
+    final id = state.editingId;
+    if (id == null || state.readOnly) return null;
+    await ref.read(entriesRepositoryProvider).softDelete(id);
+    return id;
   }
 
   /// Moderator rows: one tap records that moderation was done. Its hours are

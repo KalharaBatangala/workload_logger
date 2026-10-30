@@ -55,6 +55,24 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
     }
   }
 
+  /// Edit mode: delete, go back, and offer Undo.
+  Future<void> _delete() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final entries = ref.read(entriesRepositoryProvider);
+    final id = await ref.read(logFlowProvider.notifier).deleteEditing();
+    if (id == null || !mounted) return;
+    context.pop();
+    messenger.showSnackBar(
+      SnackBar(
+        content: const Text('Entry deleted'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () => entries.undoDelete(id),
+        ),
+      ),
+    );
+  }
+
   Future<void> _pickSpent(int? current) async {
     const options = [15, 30, 45, 60, 90, 120, 180, 240];
     final picked = await showModalBottomSheet<int>(
@@ -185,148 +203,191 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
                     title: state.isEditing ? 'Edit entry' : 'Log work',
                     showProgress: !state.isEditing,
                     onLeading: () => context.pop(),
+                    action: state.isEditing && !state.readOnly
+                        ? IconButton(
+                            tooltip: 'Delete entry',
+                            onPressed: _delete,
+                            icon: const Icon(Icons.delete_outline_rounded),
+                          )
+                        : null,
                   ),
-                  const SizedBox(height: AppSpacing.l),
-                  Row(
-                    children: [
-                      ModuleBadge(
-                        state.moduleCode ?? '',
-                        style: ModuleBadgeStyle.navy,
-                      ),
-                      const SizedBox(width: AppSpacing.s),
-                      Expanded(
-                        child: Text(
-                          ActivityLabels.title(activity),
-                          style: AppText.stepTitle,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (state.subtypes.length > 1) ...[
+                  if (state.readOnly) ...[
                     const SizedBox(height: AppSpacing.l),
-                    const SectionLabel('Type'),
-                    SegmentedChoice(
-                      options: state.subtypes,
-                      selected: state.subtype,
-                      labelOf: ActivityLabels.subtype,
-                      onSelected: flow.setSubtype,
+                    AppCard(
+                      color: AppColors.goldTint,
+                      borderColor: AppColors.goldBorder,
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.lock_outline_rounded,
+                            color: AppColors.goldTextDeep,
+                          ),
+                          const SizedBox(width: AppSpacing.m),
+                          Expanded(
+                            child: Text(
+                              'This period is closed. Entries in it can\'t be '
+                              'changed.',
+                              style: AppText.bodySmall.copyWith(
+                                color: AppColors.goldTextDeep,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                  const SizedBox(height: AppSpacing.l),
-                  AppCard(
-                    radius: AppRadii.cardLarge,
+                  IgnorePointer(
+                    ignoring: state.readOnly,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        CountStepper(
-                          label: ActivityLabels.countLabel(kind),
-                          value: state.count,
-                          step: isHours ? 0.5 : 1,
-                          max: isHours ? maxLectureHours : null,
-                          quickValues: ActivityLabels.quickCounts(kind),
-                          onChanged: flow.setCount,
+                        const SizedBox(height: AppSpacing.l),
+                        Row(
+                          children: [
+                            ModuleBadge(
+                              state.moduleCode ?? '',
+                              style: ModuleBadgeStyle.navy,
+                            ),
+                            const SizedBox(width: AppSpacing.s),
+                            Expanded(
+                              child: Text(
+                                ActivityLabels.title(activity),
+                                style: AppText.stepTitle,
+                              ),
+                            ),
+                          ],
                         ),
-                        if (state.needsQpp) ...[
+                        if (state.subtypes.length > 1) ...[
                           const SizedBox(height: AppSpacing.l),
-                          const Divider(),
-                          const SizedBox(height: AppSpacing.m),
-                          CountStepper(
-                            compact: true,
-                            label: 'Questions per paper',
-                            value: state.questionsPerPaper ?? 0,
-                            max: maxQuestionsPerPaper.toDouble(),
-                            quickValues: const [1, 2, 3, 5, 10],
-                            onChanged: (v) =>
-                                flow.setQuestionsPerPaper(v > 0 ? v : null),
+                          const SectionLabel('Type'),
+                          SegmentedChoice(
+                            options: state.subtypes,
+                            selected: state.subtype,
+                            labelOf: ActivityLabels.subtype,
+                            onSelected: flow.setSubtype,
                           ),
                         ],
                         const SizedBox(height: AppSpacing.l),
-                        CreditStrip(
-                          explanation: creditExplanation(state, rates),
-                          hours: credit,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.l),
-                  const SectionLabel('When'),
-                  DateChips(
-                    selected: state.date,
-                    today: today,
-                    onSelected: flow.setDate,
-                  ),
-                  const SizedBox(height: AppSpacing.l),
-                  const SectionLabel('Optional'),
-                  AppCard(
-                    padding: EdgeInsets.zero,
-                    child: Column(
-                      children: [
-                        _OptionalRow(
-                          label: 'Time actually spent',
-                          value: state.spentMinutes == null
-                              ? 'Add'
-                              : formatMinutes(state.spentMinutes!),
-                          onTap: () => _pickSpent(state.spentMinutes),
-                        ),
-                        const Divider(height: 1),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.l,
-                          ),
-                          child: Row(
+                        AppCard(
+                          radius: AppRadii.cardLarge,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              const Text('Note', style: AppText.body),
-                              const SizedBox(width: AppSpacing.l),
-                              Expanded(
-                                child: TextField(
-                                  controller: _note,
-                                  onChanged: flow.setNote,
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText:
-                                        'e.g. Quiz 2, Flutter state management',
+                              CountStepper(
+                                label: ActivityLabels.countLabel(kind),
+                                value: state.count,
+                                step: isHours ? 0.5 : 1,
+                                max: isHours ? maxLectureHours : null,
+                                quickValues: ActivityLabels.quickCounts(kind),
+                                onChanged: flow.setCount,
+                              ),
+                              if (state.needsQpp) ...[
+                                const SizedBox(height: AppSpacing.l),
+                                const Divider(),
+                                const SizedBox(height: AppSpacing.m),
+                                CountStepper(
+                                  compact: true,
+                                  label: 'Questions per paper',
+                                  value: state.questionsPerPaper ?? 0,
+                                  max: maxQuestionsPerPaper.toDouble(),
+                                  quickValues: const [1, 2, 3, 5, 10],
+                                  onChanged: (v) => flow.setQuestionsPerPaper(
+                                    v > 0 ? v : null,
                                   ),
                                 ),
+                              ],
+                              const SizedBox(height: AppSpacing.l),
+                              CreditStrip(
+                                explanation: creditExplanation(state, rates),
+                                hours: credit,
                               ),
                             ],
                           ),
                         ),
-                        const Divider(height: 1),
-                        _OptionalRow(
-                          icon: Icons.photo_camera_outlined,
-                          label: 'Add a photo as evidence',
-                          onTap: _addPhoto,
+                        const SizedBox(height: AppSpacing.l),
+                        const SectionLabel('When'),
+                        DateChips(
+                          selected: state.date,
+                          today: today,
+                          onSelected: flow.setDate,
                         ),
-                        for (final (i, _) in state.photoPaths.indexed)
-                          ListTile(
-                            dense: true,
-                            leading: const Icon(Icons.image_outlined),
-                            title: Text('Photo ${i + 1}'),
-                            trailing: IconButton(
-                              tooltip: 'Remove photo ${i + 1}',
-                              onPressed: () => flow.removePhoto(i),
-                              icon: const Icon(Icons.close_rounded),
+                        const SizedBox(height: AppSpacing.l),
+                        const SectionLabel('Optional'),
+                        AppCard(
+                          padding: EdgeInsets.zero,
+                          child: Column(
+                            children: [
+                              _OptionalRow(
+                                label: 'Time actually spent',
+                                value: state.spentMinutes == null
+                                    ? 'Add'
+                                    : formatMinutes(state.spentMinutes!),
+                                onTap: () => _pickSpent(state.spentMinutes),
+                              ),
+                              const Divider(height: 1),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.l,
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Text('Note', style: AppText.body),
+                                    const SizedBox(width: AppSpacing.l),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _note,
+                                        onChanged: flow.setNote,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: 'e.g. Quiz 2, Flutter state management',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Divider(height: 1),
+                              _OptionalRow(
+                                icon: Icons.photo_camera_outlined,
+                                label: 'Add a photo as evidence',
+                                onTap: _addPhoto,
+                              ),
+                              for (final (i, _) in state.photoPaths.indexed)
+                                ListTile(
+                                  dense: true,
+                                  leading: const Icon(Icons.image_outlined),
+                                  title: Text('Photo ${i + 1}'),
+                                  trailing: IconButton(
+                                    tooltip: 'Remove photo ${i + 1}',
+                                    onPressed: () => flow.removePhoto(i),
+                                    icon: const Icon(Icons.close_rounded),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        if (state.error != null) ...[
+                          const SizedBox(height: AppSpacing.m),
+                          Text(
+                            state.error!,
+                            style: AppText.bodySmall.copyWith(
+                              color: AppColors.error,
                             ),
                           ),
+                        ],
                       ],
                     ),
                   ),
-                  if (state.error != null) ...[
-                    const SizedBox(height: AppSpacing.m),
-                    Text(
-                      state.error!,
-                      style: AppText.bodySmall.copyWith(color: AppColors.error),
-                    ),
-                  ],
                 ],
               ),
             ),
-            _SaveBar(
-              complete: state.isComplete,
-              credit: credit,
-              busy: _saving,
-              onSave: _save,
-            ),
+            if (!state.readOnly)
+              _SaveBar(
+                complete: state.isComplete,
+                credit: credit,
+                busy: _saving,
+                onSave: _save,
+              ),
           ],
         ),
       ),

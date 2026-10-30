@@ -58,9 +58,9 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] Empty states
 
 ### M6 · History and drafts
-- [ ] All entries grouped by day; Drafts tab with Finish / Discard
-- [ ] Batch progress cards for marking
-- [ ] Edit sheet + delete with undo snackbar; locked periods read-only
+- [x] All entries grouped by day; Drafts tab with Finish / Discard
+- [x] Batch progress cards for marking
+- [x] Edit sheet + delete with undo snackbar; locked periods read-only
 
 ### M7 · Summary and export
 - [ ] Period selector, hero, category bars, zero chips, role-row list + detail (SPEC §8.7)

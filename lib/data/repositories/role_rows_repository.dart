@@ -32,6 +32,9 @@ class RoleRowsRepository {
 
   Future<List<RoleRow>> getAll() => _db.select(_db.roleRows).get();
 
+  /// All rows, including inactive ones (for entries of old modules).
+  Stream<List<RoleRow>> watchAll() => _db.select(_db.roleRows).watch();
+
   Future<RoleRow?> byId(int id) => (_db.select(
     _db.roleRows,
   )..where((r) => r.id.equals(id))).getSingleOrNull();

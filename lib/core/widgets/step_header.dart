@@ -13,6 +13,7 @@ class StepHeader extends StatelessWidget {
     this.title = 'Log work',
     this.dateLabel,
     this.onDateTap,
+    this.action,
     this.steps = 3,
     this.showProgress = true,
   });
@@ -32,6 +33,9 @@ class StepHeader extends StatelessWidget {
   /// e.g. "Today"; no chip when null.
   final String? dateLabel;
   final VoidCallback? onDateTap;
+
+  /// Shown on the right when there is no date chip (e.g. Delete).
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +63,7 @@ class StepHeader extends StatelessWidget {
               if (dateLabel != null)
                 _DateChip(label: dateLabel!, onTap: onDateTap)
               else
-                const SizedBox(width: 52),
+                action ?? const SizedBox(width: 52),
             ],
           ),
         ),
