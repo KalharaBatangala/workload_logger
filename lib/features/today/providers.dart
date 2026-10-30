@@ -39,16 +39,7 @@ class TimetableCard {
 
   /// Slot length in hours, rounded to the nearest half hour (lecture hours
   /// are logged in 0.5 steps, SPEC §12), at least 0.5.
-  double get hours {
-    int minutes(String hhmm) {
-      final p = hhmm.split(':');
-      return int.parse(p[0]) * 60 + int.parse(p[1]);
-    }
-
-    final length = minutes(slot.endTime) - minutes(slot.startTime);
-    final rounded = (length / 30).round() / 2;
-    return rounded < 0.5 ? 0.5 : rounded;
-  }
+  double get hours => slotLengthHours(slot.startTime, slot.endTime);
 }
 
 final _todaySlotsProvider = StreamProvider.autoDispose<List<TimetableSlot>>((

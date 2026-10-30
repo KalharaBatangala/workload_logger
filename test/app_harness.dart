@@ -7,6 +7,8 @@ import 'package:workload_logger/app.dart';
 import 'package:workload_logger/data/db/app_database.dart';
 import 'package:workload_logger/data/demo_seed.dart';
 import 'package:workload_logger/data/providers.dart';
+import 'package:workload_logger/features/reminders/notification_service.dart';
+import 'package:workload_logger/features/reminders/providers.dart';
 
 import 'data/test_database.dart';
 
@@ -41,6 +43,7 @@ Future<AppDatabase> pumpApp(
   WidgetTester tester, {
   bool onboarded = true,
   bool demo = false,
+  FakeNotificationService? notifications,
   List<Override> overrides = const [],
 }) async {
   // The phone frame of the designs: 390 × 844 logical pixels.
@@ -71,6 +74,9 @@ Future<AppDatabase> pumpApp(
       overrides: [
         databaseProvider.overrideWithValue(db),
         clockProvider.overrideWithValue(() => testNow),
+        notificationServiceProvider.overrideWithValue(
+          notifications ?? FakeNotificationService(),
+        ),
         ...overrides,
       ],
       child: const App(),

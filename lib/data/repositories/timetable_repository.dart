@@ -16,6 +16,8 @@ class TimetableRepository {
           ]))
           .watch();
 
+  Future<List<TimetableSlot>> getAll() => _db.select(_db.timetableSlots).get();
+
   /// Slots on a weekday (1 = Monday … 7 = Sunday).
   Stream<List<TimetableSlot>> watchForWeekday(int weekday) =>
       (_db.select(_db.timetableSlots)

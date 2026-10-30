@@ -16,6 +16,9 @@ class ReminderSettingsRepository {
     _db.reminderSettings,
   )..where((r) => r.key.equalsValue(key))).getSingleOrNull();
 
+  Future<List<ReminderSetting>> getAll() =>
+      _db.select(_db.reminderSettings).get();
+
   Future<void> save(ReminderSetting setting) =>
       _db.into(_db.reminderSettings).insertOnConflictUpdate(setting);
 }

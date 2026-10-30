@@ -70,11 +70,11 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] Test: exported My Data_Entry rows reproduce the fixture hours
 
 ### M8 · Setup, timetable and reminders
-- [ ] Setup screen sections (SPEC §8.8): workload file, rates view, timetable CRUD, reminders,
+- [x] Setup screen sections (SPEC §8.8): workload file, rates view, timetable CRUD, reminders,
       PG students, other-work categories, submission date, remove demo data
-- [ ] Notifications (SPEC §9): evening, next-morning, weekly, submission; actions Log work /
+- [x] Notifications (SPEC §9): evening, next-morning, weekly, submission; actions Log work /
       Lecture done / Nothing; deep links into the log flow with the right date
-- [ ] Android 13 notification permission flow; reschedule on start, settings change and save
+- [x] Android 13 notification permission flow; reschedule on start, settings change and save
 
 ### M9 · Polish and release
 - [ ] Accessibility pass (labels, 44 dp targets, text scaling to 1.3×)

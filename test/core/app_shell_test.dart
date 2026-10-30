@@ -26,7 +26,7 @@ void main() {
     for (final (label, marker) in [
       ('History', 'All entries'),
       ('Summary', 'Your role rows'),
-      ('Setup', 'Setup arrives in M8.'),
+      ('Setup', 'MY TIMETABLE'),
       ('Today', 'Logged today'),
     ]) {
       await tester.tap(tab(label));

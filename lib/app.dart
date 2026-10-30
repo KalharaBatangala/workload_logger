@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/messenger.dart';
 import 'core/router.dart';
 import 'core/theme/app_theme.dart';
 import 'data/providers.dart';
+import 'features/reminders/providers.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -23,6 +25,10 @@ class _AppState extends ConsumerState<App> {
     _lifecycle = AppLifecycleListener(
       onResume: () => ref.invalidate(todayProvider),
     );
+    // Reminders start once the first frame (and the router) exist.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => ref.read(remindersBootstrapProvider),
+    );
   }
 
   @override
@@ -38,6 +44,7 @@ class _AppState extends ConsumerState<App> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       themeMode: ThemeMode.light,
+      scaffoldMessengerKey: ref.watch(scaffoldMessengerKeyProvider),
       routerConfig: ref.watch(routerProvider),
     );
   }
