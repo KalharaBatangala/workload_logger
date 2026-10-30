@@ -15,8 +15,30 @@ import '../../../domain/module_groups.dart';
 import '../providers.dart';
 
 /// Step 1 — Which module? (SPEC §8.2)
-class ModuleScreen extends ConsumerWidget {
-  const ModuleScreen({super.key});
+class ModuleScreen extends ConsumerStatefulWidget {
+  const ModuleScreen({super.key, this.initialDate});
+
+  /// From a reminder: the day to log for (`yyyy-MM-dd`).
+  final String? initialDate;
+
+  @override
+  ConsumerState<ModuleScreen> createState() => _ModuleScreenState();
+}
+
+class _ModuleScreenState extends ConsumerState<ModuleScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final date = widget.initialDate;
+    if (date != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Never a future date (SPEC §12).
+        if (mounted && date.compareTo(ref.read(todayProvider)) <= 0) {
+          ref.read(logFlowProvider.notifier).setDate(date);
+        }
+      });
+    }
+  }
 
   void _open(BuildContext context, WidgetRef ref, ModuleGroup group) {
     ref.read(logFlowProvider.notifier).chooseModule(group);
@@ -24,7 +46,7 @@ class ModuleScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final date = ref.watch(logFlowProvider.select((s) => s.date));
     final today = ref.watch(todayProvider);
     final groups = ref.watch(moduleGroupsProvider).value;

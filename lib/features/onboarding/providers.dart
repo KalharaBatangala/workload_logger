@@ -12,6 +12,7 @@ import '../../domain/dates.dart';
 import '../../domain/enums.dart';
 import '../../domain/roll_up.dart';
 import '../../domain/summary.dart';
+import '../reminders/providers.dart';
 
 /// A picked file: its name and contents. Null when the user cancels.
 typedef PickedWorkbook = ({String name, Uint8List bytes});
@@ -200,6 +201,9 @@ class OnboardingController extends Notifier<OnboardingState> {
             time: eveningTime,
           ),
     );
+    // Android 13+ asks the user; refusing is fine (Setup explains how to
+    // turn notifications on later).
+    await ref.read(notificationServiceProvider).requestPermission();
     await ref.read(profileRepositoryProvider).setOnboardingDone();
   }
 }

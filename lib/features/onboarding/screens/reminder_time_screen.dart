@@ -52,9 +52,8 @@ class _ReminderTimeScreenState extends ConsumerState<ReminderTimeScreen> {
       step: 3,
       title: 'When should we remind you?',
       subtitle:
-          'Each evening the app can ask whether there is anything to log '
-          'for the day. Reminders are switched on in a later update; your '
-          'time is saved now.',
+          'Each evening the app asks whether there is anything to log for '
+          'the day. Android will ask you to allow notifications.',
       body: OnboardingCard(
         child: Semantics(
           container: true,

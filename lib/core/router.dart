@@ -16,6 +16,8 @@ import '../features/onboarding/screens/load_workbook_screen.dart';
 import '../features/onboarding/screens/pick_name_screen.dart';
 import '../features/onboarding/screens/reminder_time_screen.dart';
 import '../features/onboarding/screens/welcome_screen.dart';
+import '../features/setup/screens/categories_screen.dart';
+import '../features/setup/screens/rates_screen.dart';
 import '../features/setup/screens/setup_screen.dart';
 import '../features/summary/screens/role_row_detail_screen.dart';
 import '../features/summary/screens/summary_screen.dart';
@@ -33,6 +35,9 @@ abstract final class AppRoutes {
   static String logDetails(String code) => '/log/m/$code/details';
   static const logSaved = '/log/saved';
   static const logOther = '/log/other';
+  static const setupRates = '/setup/rates';
+  static const setupCategories = '/setup/categories';
+  static String logOn(String date) => '/log?date=$date';
   static String summaryRow(int roleRowId) => '/summary/row/$roleRowId';
   static String logLecture(String code, int roleRowId) =>
       '/log/m/$code/lecture/$roleRowId';
@@ -110,15 +115,30 @@ GoRouter createRouter({
               ),
             ],
           ),
-          _branch(AppRoutes.setup, const SetupScreen()),
+          _branch(
+            AppRoutes.setup,
+            const SetupScreen(),
+            routes: [
+              GoRoute(
+                path: 'rates',
+                builder: (context, state) => const RatesScreen(),
+              ),
+              GoRoute(
+                path: 'categories',
+                builder: (context, state) => const CategoriesScreen(),
+              ),
+            ],
+          ),
         ],
       ),
       // The log flow is full-screen, above the shell (no bottom bar).
       GoRoute(
         path: AppRoutes.log,
         parentNavigatorKey: rootNavigatorKey,
-        pageBuilder: (context, state) =>
-            const MaterialPage(fullscreenDialog: true, child: ModuleScreen()),
+        pageBuilder: (context, state) => MaterialPage(
+          fullscreenDialog: true,
+          child: ModuleScreen(initialDate: state.uri.queryParameters['date']),
+        ),
         routes: [
           GoRoute(
             path: 'm/:code',

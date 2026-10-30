@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../format.dart';
 import '../theme/tokens.dart';
+import 'input_dialogs.dart';
 
 /// Big number between − and + with quick-set chips (SPEC §8.4). Tapping the
 /// number opens a numeric input. 0 shows as "0" in a muted colour (not set).
@@ -39,7 +39,7 @@ class CountStepper extends StatelessWidget {
   Future<void> _type(BuildContext context) async {
     final typed = await showDialog<double>(
       context: context,
-      builder: (context) => _TypeNumberDialog(
+      builder: (context) => NumberDialog(
         label: label,
         initial: value > 0 ? formatCount(value) : '',
         decimals: step < 1,
@@ -204,63 +204,6 @@ class _QuickChip extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Typing a number. Owns its text controller, so it is disposed only once
-/// the dialog has finished closing.
-class _TypeNumberDialog extends StatefulWidget {
-  const _TypeNumberDialog({
-    required this.label,
-    required this.initial,
-    required this.decimals,
-  });
-
-  final String label;
-  final String initial;
-  final bool decimals;
-
-  @override
-  State<_TypeNumberDialog> createState() => _TypeNumberDialogState();
-}
-
-class _TypeNumberDialogState extends State<_TypeNumberDialog> {
-  late final TextEditingController _controller = TextEditingController(
-    text: widget.initial,
-  );
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _submit() =>
-      Navigator.pop(context, double.tryParse(_controller.text) ?? 0);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.label),
-      content: TextField(
-        controller: _controller,
-        autofocus: true,
-        keyboardType: TextInputType.numberWithOptions(decimal: widget.decimals),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(
-            RegExp(widget.decimals ? r'[0-9.]' : r'[0-9]'),
-          ),
-        ],
-        onSubmitted: (_) => _submit(),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(onPressed: _submit, child: const Text('OK')),
-      ],
     );
   }
 }

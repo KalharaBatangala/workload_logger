@@ -39,3 +39,15 @@ String suggestedAcademicYearLabel(DateTime date) {
   final start = date.month >= DateTime.august ? date.year : date.year - 1;
   return '$start/${((start + 1) % 100).toString().padLeft(2, '0')}';
 }
+
+/// Length of a timetable slot in hours, rounded to the nearest half hour
+/// (lecture hours are logged in 0.5 steps, SPEC §12), at least 0.5.
+double slotLengthHours(String startHhmm, String endHhmm) {
+  int minutes(String hhmm) {
+    final p = hhmm.split(':');
+    return int.parse(p[0]) * 60 + int.parse(p[1]);
+  }
+
+  final rounded = ((minutes(endHhmm) - minutes(startHhmm)) / 30).round() / 2;
+  return rounded < 0.5 ? 0.5 : rounded;
+}
