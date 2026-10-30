@@ -18,13 +18,13 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] App name "Workload Logger", simple navy/gold launcher icon (placeholder OK)
 
 ### M1 · Domain and credit maths (pure Dart, no UI)
-- [ ] Enums: Role, ModuleType, Activity, Subtype, Category (11 summary categories)
-- [ ] `RateSet` with defaults from SPEC §3.1
-- [ ] `workbook_mapping.dart`: activity/subtype ↔ Data_Entry columns (SPEC §3.2)
-- [ ] `credit_calculator.dart`: per-entry credit, per-role-row inputs → 11 categories (SPEC §4)
-- [ ] Roll-up of entries → workbook inputs incl. weighted Qs/paper (SPEC §7.1)
-- [ ] Activity availability by role and module type (SPEC §5)
-- [ ] Unit tests for every fixture in SPEC §13
+- [x] Enums: Role, ModuleType, Activity, Subtype, Category (11 summary categories)
+- [x] `RateSet` with defaults from SPEC §3.1
+- [x] `workbook_mapping.dart`: activity/subtype ↔ Data_Entry columns (SPEC §3.2)
+- [x] `credit_calculator.dart`: per-entry credit, per-role-row inputs → 11 categories (SPEC §4)
+- [x] Roll-up of entries → workbook inputs incl. weighted Qs/paper (SPEC §7.1)
+- [x] Activity availability by role and module type (SPEC §5)
+- [x] Unit tests for every fixture in SPEC §13
 
 ### M2 · Database
 - [ ] Drift tables from SPEC §6, database class, migrations set up (schemaVersion 1)
