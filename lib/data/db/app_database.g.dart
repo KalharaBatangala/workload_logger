@@ -5133,6 +5133,276 @@ class PeriodsCompanion extends UpdateCompanion<Period> {
   }
 }
 
+class $TimetableAnswersTable extends TimetableAnswers
+    with TableInfo<$TimetableAnswersTable, TimetableAnswer> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TimetableAnswersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _slotIdMeta = const VerificationMeta('slotId');
+  @override
+  late final GeneratedColumn<int> slotId = GeneratedColumn<int>(
+    'slot_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES timetable_slots (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SlotAnswer, String> answer =
+      GeneratedColumn<String>(
+        'answer',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<SlotAnswer>($TimetableAnswersTable.$converteranswer);
+  @override
+  List<GeneratedColumn> get $columns => [date, slotId, answer];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'timetable_answers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TimetableAnswer> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('slot_id')) {
+      context.handle(
+        _slotIdMeta,
+        slotId.isAcceptableOrUnknown(data['slot_id']!, _slotIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slotIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {date, slotId};
+  @override
+  TimetableAnswer map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TimetableAnswer(
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      slotId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}slot_id'],
+      )!,
+      answer: $TimetableAnswersTable.$converteranswer.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}answer'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $TimetableAnswersTable createAlias(String alias) {
+    return $TimetableAnswersTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SlotAnswer, String, String> $converteranswer =
+      const EnumNameConverter<SlotAnswer>(SlotAnswer.values);
+}
+
+class TimetableAnswer extends DataClass implements Insertable<TimetableAnswer> {
+  final String date;
+  final int slotId;
+  final SlotAnswer answer;
+  const TimetableAnswer({
+    required this.date,
+    required this.slotId,
+    required this.answer,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['date'] = Variable<String>(date);
+    map['slot_id'] = Variable<int>(slotId);
+    {
+      map['answer'] = Variable<String>(
+        $TimetableAnswersTable.$converteranswer.toSql(answer),
+      );
+    }
+    return map;
+  }
+
+  TimetableAnswersCompanion toCompanion(bool nullToAbsent) {
+    return TimetableAnswersCompanion(
+      date: Value(date),
+      slotId: Value(slotId),
+      answer: Value(answer),
+    );
+  }
+
+  factory TimetableAnswer.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TimetableAnswer(
+      date: serializer.fromJson<String>(json['date']),
+      slotId: serializer.fromJson<int>(json['slotId']),
+      answer: $TimetableAnswersTable.$converteranswer.fromJson(
+        serializer.fromJson<String>(json['answer']),
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'date': serializer.toJson<String>(date),
+      'slotId': serializer.toJson<int>(slotId),
+      'answer': serializer.toJson<String>(
+        $TimetableAnswersTable.$converteranswer.toJson(answer),
+      ),
+    };
+  }
+
+  TimetableAnswer copyWith({String? date, int? slotId, SlotAnswer? answer}) =>
+      TimetableAnswer(
+        date: date ?? this.date,
+        slotId: slotId ?? this.slotId,
+        answer: answer ?? this.answer,
+      );
+  TimetableAnswer copyWithCompanion(TimetableAnswersCompanion data) {
+    return TimetableAnswer(
+      date: data.date.present ? data.date.value : this.date,
+      slotId: data.slotId.present ? data.slotId.value : this.slotId,
+      answer: data.answer.present ? data.answer.value : this.answer,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TimetableAnswer(')
+          ..write('date: $date, ')
+          ..write('slotId: $slotId, ')
+          ..write('answer: $answer')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(date, slotId, answer);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TimetableAnswer &&
+          other.date == this.date &&
+          other.slotId == this.slotId &&
+          other.answer == this.answer);
+}
+
+class TimetableAnswersCompanion extends UpdateCompanion<TimetableAnswer> {
+  final Value<String> date;
+  final Value<int> slotId;
+  final Value<SlotAnswer> answer;
+  final Value<int> rowid;
+  const TimetableAnswersCompanion({
+    this.date = const Value.absent(),
+    this.slotId = const Value.absent(),
+    this.answer = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TimetableAnswersCompanion.insert({
+    required String date,
+    required int slotId,
+    required SlotAnswer answer,
+    this.rowid = const Value.absent(),
+  }) : date = Value(date),
+       slotId = Value(slotId),
+       answer = Value(answer);
+  static Insertable<TimetableAnswer> custom({
+    Expression<String>? date,
+    Expression<int>? slotId,
+    Expression<String>? answer,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (date != null) 'date': date,
+      if (slotId != null) 'slot_id': slotId,
+      if (answer != null) 'answer': answer,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TimetableAnswersCompanion copyWith({
+    Value<String>? date,
+    Value<int>? slotId,
+    Value<SlotAnswer>? answer,
+    Value<int>? rowid,
+  }) {
+    return TimetableAnswersCompanion(
+      date: date ?? this.date,
+      slotId: slotId ?? this.slotId,
+      answer: answer ?? this.answer,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (slotId.present) {
+      map['slot_id'] = Variable<int>(slotId.value);
+    }
+    if (answer.present) {
+      map['answer'] = Variable<String>(
+        $TimetableAnswersTable.$converteranswer.toSql(answer.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TimetableAnswersCompanion(')
+          ..write('date: $date, ')
+          ..write('slotId: $slotId, ')
+          ..write('answer: $answer, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5152,6 +5422,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DayReviewsTable dayReviews = $DayReviewsTable(this);
   late final $PgSupervisionTable pgSupervision = $PgSupervisionTable(this);
   late final $PeriodsTable periods = $PeriodsTable(this);
+  late final $TimetableAnswersTable timetableAnswers = $TimetableAnswersTable(
+    this,
+  );
   late final Index entriesDate = Index(
     'entries_date',
     'CREATE INDEX entries_date ON entries (date)',
@@ -5181,6 +5454,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     dayReviews,
     pgSupervision,
     periods,
+    timetableAnswers,
     entriesDate,
     entriesRoleRow,
     entriesStatus,
@@ -5200,6 +5474,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('timetable_slots', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'timetable_slots',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('timetable_answers', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -7779,6 +8060,26 @@ final class $$TimetableSlotsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$TimetableAnswersTable, List<TimetableAnswer>>
+  _timetableAnswersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.timetableAnswers,
+    aliasName: 'timetable_slots__id__timetable_answers__slot_id',
+  );
+
+  $$TimetableAnswersTableProcessedTableManager get timetableAnswersRefs {
+    final manager = $$TimetableAnswersTableTableManager(
+      $_db,
+      $_db.timetableAnswers,
+    ).filter((f) => f.slotId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _timetableAnswersRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$TimetableSlotsTableFilterComposer
@@ -7842,6 +8143,31 @@ class $$TimetableSlotsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> timetableAnswersRefs(
+    Expression<bool> Function($$TimetableAnswersTableFilterComposer f) f,
+  ) {
+    final $$TimetableAnswersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.timetableAnswers,
+      getReferencedColumn: (t) => t.slotId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimetableAnswersTableFilterComposer(
+            $db: $db,
+            $table: $db.timetableAnswers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -7957,6 +8283,31 @@ class $$TimetableSlotsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> timetableAnswersRefs<T extends Object>(
+    Expression<T> Function($$TimetableAnswersTableAnnotationComposer a) f,
+  ) {
+    final $$TimetableAnswersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.timetableAnswers,
+      getReferencedColumn: (t) => t.slotId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimetableAnswersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.timetableAnswers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$TimetableSlotsTableTableManager
@@ -7972,7 +8323,7 @@ class $$TimetableSlotsTableTableManager
           $$TimetableSlotsTableUpdateCompanionBuilder,
           (TimetableSlot, $$TimetableSlotsTableReferences),
           TimetableSlot,
-          PrefetchHooks Function({bool roleRowId})
+          PrefetchHooks Function({bool roleRowId, bool timetableAnswersRefs})
         > {
   $$TimetableSlotsTableTableManager(
     _$AppDatabase db,
@@ -8031,45 +8382,69 @@ class $$TimetableSlotsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({roleRowId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (roleRowId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.roleRowId,
-                        referencedTable: $$TimetableSlotsTableReferences
-                            ._roleRowIdTable(db),
-                        referencedColumn: $$TimetableSlotsTableReferences
-                            ._roleRowIdTable(db)
-                            .id,
-                      ) as T;
-                    }
+          prefetchHooksCallback:
+              ({roleRowId = false, timetableAnswersRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (timetableAnswersRefs) db.timetableAnswers,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (roleRowId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.roleRowId,
+                            referencedTable: $$TimetableSlotsTableReferences
+                                ._roleRowIdTable(db),
+                            referencedColumn: $$TimetableSlotsTableReferences
+                                ._roleRowIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (timetableAnswersRefs)
+                        await $_getPrefetchedDataByColumns<
+                          TimetableSlot,
+                          $TimetableSlotsTable,
+                          TimetableAnswer,
+                          $TimetableAnswersTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TimetableSlotsTableReferences
+                              ._timetableAnswersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TimetableSlotsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).timetableAnswersRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'slot_id',
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -8086,7 +8461,7 @@ typedef $$TimetableSlotsTableProcessedTableManager =
       $$TimetableSlotsTableUpdateCompanionBuilder,
       (TimetableSlot, $$TimetableSlotsTableReferences),
       TimetableSlot,
-      PrefetchHooks Function({bool roleRowId})
+      PrefetchHooks Function({bool roleRowId, bool timetableAnswersRefs})
     >;
 typedef $$ReminderSettingsTableCreateCompanionBuilder =
     ReminderSettingsCompanion Function({
@@ -8781,6 +9156,292 @@ typedef $$PeriodsTableProcessedTableManager =
       Period,
       PrefetchHooks Function()
     >;
+typedef $$TimetableAnswersTableCreateCompanionBuilder =
+    TimetableAnswersCompanion Function({
+      required String date,
+      required int slotId,
+      required SlotAnswer answer,
+      Value<int> rowid,
+    });
+typedef $$TimetableAnswersTableUpdateCompanionBuilder =
+    TimetableAnswersCompanion Function({
+      Value<String> date,
+      Value<int> slotId,
+      Value<SlotAnswer> answer,
+      Value<int> rowid,
+    });
+
+final class $$TimetableAnswersTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $TimetableAnswersTable, TimetableAnswer> {
+  $$TimetableAnswersTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TimetableSlotsTable _slotIdTable(_$AppDatabase db) => db
+      .timetableSlots
+      .createAlias('timetable_answers__slot_id__timetable_slots__id');
+
+  $$TimetableSlotsTableProcessedTableManager get slotId {
+    final $_column = $_itemColumn<int>('slot_id')!;
+
+    final manager = $$TimetableSlotsTableTableManager(
+      $_db,
+      $_db.timetableSlots,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_slotIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TimetableAnswersTableFilterComposer
+    extends Composer<_$AppDatabase, $TimetableAnswersTable> {
+  $$TimetableAnswersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SlotAnswer, SlotAnswer, String> get answer =>
+      $composableBuilder(
+        column: $table.answer,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  $$TimetableSlotsTableFilterComposer get slotId {
+    final $$TimetableSlotsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.slotId,
+      referencedTable: $db.timetableSlots,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimetableSlotsTableFilterComposer(
+            $db: $db,
+            $table: $db.timetableSlots,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TimetableAnswersTableOrderingComposer
+    extends Composer<_$AppDatabase, $TimetableAnswersTable> {
+  $$TimetableAnswersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get answer => $composableBuilder(
+    column: $table.answer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TimetableSlotsTableOrderingComposer get slotId {
+    final $$TimetableSlotsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.slotId,
+      referencedTable: $db.timetableSlots,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimetableSlotsTableOrderingComposer(
+            $db: $db,
+            $table: $db.timetableSlots,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TimetableAnswersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TimetableAnswersTable> {
+  $$TimetableAnswersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SlotAnswer, String> get answer =>
+      $composableBuilder(column: $table.answer, builder: (column) => column);
+
+  $$TimetableSlotsTableAnnotationComposer get slotId {
+    final $$TimetableSlotsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.slotId,
+      referencedTable: $db.timetableSlots,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimetableSlotsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.timetableSlots,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TimetableAnswersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TimetableAnswersTable,
+          TimetableAnswer,
+          $$TimetableAnswersTableFilterComposer,
+          $$TimetableAnswersTableOrderingComposer,
+          $$TimetableAnswersTableAnnotationComposer,
+          $$TimetableAnswersTableCreateCompanionBuilder,
+          $$TimetableAnswersTableUpdateCompanionBuilder,
+          (TimetableAnswer, $$TimetableAnswersTableReferences),
+          TimetableAnswer,
+          PrefetchHooks Function({bool slotId})
+        > {
+  $$TimetableAnswersTableTableManager(
+    _$AppDatabase db,
+    $TimetableAnswersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TimetableAnswersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TimetableAnswersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TimetableAnswersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> date = const Value.absent(),
+                Value<int> slotId = const Value.absent(),
+                Value<SlotAnswer> answer = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TimetableAnswersCompanion(
+                date: date,
+                slotId: slotId,
+                answer: answer,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String date,
+                required int slotId,
+                required SlotAnswer answer,
+                Value<int> rowid = const Value.absent(),
+              }) => TimetableAnswersCompanion.insert(
+                date: date,
+                slotId: slotId,
+                answer: answer,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TimetableAnswersTable, TimetableAnswer>(table),
+                  $$TimetableAnswersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({slotId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (slotId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.slotId,
+                        referencedTable: $$TimetableAnswersTableReferences
+                            ._slotIdTable(db),
+                        referencedColumn: $$TimetableAnswersTableReferences
+                            ._slotIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TimetableAnswersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TimetableAnswersTable,
+      TimetableAnswer,
+      $$TimetableAnswersTableFilterComposer,
+      $$TimetableAnswersTableOrderingComposer,
+      $$TimetableAnswersTableAnnotationComposer,
+      $$TimetableAnswersTableCreateCompanionBuilder,
+      $$TimetableAnswersTableUpdateCompanionBuilder,
+      (TimetableAnswer, $$TimetableAnswersTableReferences),
+      TimetableAnswer,
+      PrefetchHooks Function({bool slotId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8809,4 +9470,6 @@ class $AppDatabaseManager {
       $$PgSupervisionTableTableManager(_db, _db.pgSupervision);
   $$PeriodsTableTableManager get periods =>
       $$PeriodsTableTableManager(_db, _db.periods);
+  $$TimetableAnswersTableTableManager get timetableAnswers =>
+      $$TimetableAnswersTableTableManager(_db, _db.timetableAnswers);
 }

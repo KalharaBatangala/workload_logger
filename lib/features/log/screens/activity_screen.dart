@@ -16,7 +16,7 @@ import '../../../domain/credit_calculator.dart';
 import '../../../domain/enums.dart';
 import '../../../domain/module_groups.dart';
 import '../../../domain/rates.dart';
-import '../activity_labels.dart';
+import '../../../core/activity_labels.dart';
 import '../providers.dart';
 
 /// Step 2 — What did you do? (SPEC §8.3)
@@ -103,7 +103,9 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
               group: group,
               rows: rows,
               batch: batch,
-              onChange: () => context.pop(),
+              // Step 2 may have been opened from a Today chip, with no Step 1
+              // underneath, so go there rather than pop.
+              onChange: () => context.go(AppRoutes.log),
             ),
             if (group.batches.length > 1) ...[
               const SizedBox(height: AppSpacing.l),

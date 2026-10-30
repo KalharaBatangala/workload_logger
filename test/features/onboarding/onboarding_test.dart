@@ -42,7 +42,7 @@ void main() {
     await settle(tester);
 
     expect(find.byType(AppBottomBar), findsOneWidget);
-    expect(find.text('Today arrives in M5.'), findsOneWidget);
+    expect(find.text('Logged today'), findsOneWidget);
     final profile = await db.select(db.profile).getSingle();
     expect(profile.isDemo, isTrue);
     expect(profile.onboardingDone, isTrue);

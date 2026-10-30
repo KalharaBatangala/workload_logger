@@ -14,11 +14,15 @@ class StepHeader extends StatelessWidget {
     this.dateLabel,
     this.onDateTap,
     this.steps = 3,
+    this.showProgress = true,
   });
 
   /// 1-based; bars up to and including this step are filled gold.
   final int step;
   final int steps;
+
+  /// False for screens outside the numbered steps (e.g. "Edit entry").
+  final bool showProgress;
   final String title;
 
   /// Close (X) on the first step, back arrow after.
@@ -59,23 +63,25 @@ class StepHeader extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: AppSpacing.m),
-        Row(
-          children: [
-            for (var i = 1; i <= steps; i++) ...[
-              if (i > 1) const SizedBox(width: AppSpacing.xs + 2),
-              Expanded(
-                child: Container(
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: i <= step ? AppColors.gold : AppColors.border,
-                    borderRadius: BorderRadius.circular(2),
+        if (showProgress) ...[
+          const SizedBox(height: AppSpacing.m),
+          Row(
+            children: [
+              for (var i = 1; i <= steps; i++) ...[
+                if (i > 1) const SizedBox(width: AppSpacing.xs + 2),
+                Expanded(
+                  child: Container(
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: i <= step ? AppColors.gold : AppColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
-          ],
-        ),
+          ),
+        ],
       ],
     );
   }

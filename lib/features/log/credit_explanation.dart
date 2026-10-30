@@ -2,7 +2,7 @@ import '../../core/format.dart';
 import '../../domain/activity_catalogue.dart';
 import '../../domain/credit_calculator.dart';
 import '../../domain/rates.dart';
-import 'activity_labels.dart';
+import '../../core/activity_labels.dart';
 import 'providers.dart';
 
 /// The left side of the credit strip (SPEC §8.4), e.g. "10 × 6 min credited",

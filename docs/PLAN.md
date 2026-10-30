@@ -52,10 +52,10 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] Widget tests: quiz 10 → "+1.0 h"; switching to Structured → "15.0 h"
 
 ### M5 · Today
-- [ ] Greeting, hero card with today / week / year totals (SPEC §8.1)
-- [ ] Timetable suggestion cards with Yes / Other hours / No
-- [ ] Logged today list (tap to edit), Quick log chips, zero-rows nudge
-- [ ] Empty states
+- [x] Greeting, hero card with today / week / year totals (SPEC §8.1)
+- [x] Timetable suggestion cards with Yes / Other hours / No
+- [x] Logged today list (tap to edit), Quick log chips, zero-rows nudge
+- [x] Empty states
 
 ### M6 · History and drafts
 - [ ] All entries grouped by day; Drafts tab with Finish / Discard

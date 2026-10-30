@@ -8,7 +8,9 @@ import '../features/history/screens/history_screen.dart';
 import '../features/log/screens/activity_screen.dart';
 import '../features/log/screens/details_screen.dart';
 import '../features/log/screens/module_screen.dart';
+import '../features/log/providers.dart';
 import '../features/log/screens/other_work_screen.dart';
+import '../features/log/screens/prepared_details_screen.dart';
 import '../features/log/screens/saved_screen.dart';
 import '../features/onboarding/screens/load_workbook_screen.dart';
 import '../features/onboarding/screens/pick_name_screen.dart';
@@ -30,6 +32,9 @@ abstract final class AppRoutes {
   static String logDetails(String code) => '/log/m/$code/details';
   static const logSaved = '/log/saved';
   static const logOther = '/log/other';
+  static String logLecture(String code, int roleRowId) =>
+      '/log/m/$code/lecture/$roleRowId';
+  static String editEntry(String id) => '/edit/$id';
 
   /// Shown for a moment while the profile loads at start-up.
   static const loading = '/loading';
@@ -111,6 +116,25 @@ GoRouter createRouter({
                 path: 'details',
                 builder: (context, state) => const DetailsScreen(),
               ),
+              // Today's timetable card → "Other hours": Step 3 for a lecture.
+              GoRoute(
+                path: 'lecture/:row',
+                builder: (context, state) {
+                  final rowId = int.parse(state.pathParameters['row']!);
+                  return PreparedDetailsScreen(
+                    prepare: (ref) async {
+                      final row = await ref
+                          .read(roleRowsRepositoryProvider)
+                          .byId(rowId);
+                      if (row == null) return false;
+                      await ref
+                          .read(logFlowProvider.notifier)
+                          .startLecture(row);
+                      return true;
+                    },
+                  );
+                },
+              ),
             ],
           ),
           GoRoute(
@@ -122,6 +146,32 @@ GoRouter createRouter({
             builder: (context, state) => const OtherWorkScreen(),
           ),
         ],
+      ),
+      // Editing an entry opens Step 3 over the current tab; back returns there.
+      GoRoute(
+        path: '/edit/:id', // AppRoutes.editEntry
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return MaterialPage(
+            fullscreenDialog: true,
+            child: PreparedDetailsScreen(
+              prepare: (ref) async {
+                final entry = await ref
+                    .read(entriesRepositoryProvider)
+                    .byId(id);
+                if (entry == null || entry.deletedAt != null) return false;
+                final row = entry.roleRowId == null
+                    ? null
+                    : await ref
+                          .read(roleRowsRepositoryProvider)
+                          .byId(entry.roleRowId!);
+                ref.read(logFlowProvider.notifier).loadEntry(entry, row);
+                return true;
+              },
+            ),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.loading,

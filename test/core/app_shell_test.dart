@@ -13,7 +13,7 @@ void main() {
   testApp('starts on Today with the bottom bar', (tester) async {
     await pumpApp(tester);
 
-    expect(find.text('Today arrives in M5.'), findsOneWidget);
+    expect(find.text('Logged today'), findsOneWidget);
     expect(find.byType(AppBottomBar), findsOneWidget);
     for (final label in ['Today', 'History', 'Log', 'Summary', 'Setup']) {
       expect(tab(label), findsOneWidget);
@@ -23,15 +23,15 @@ void main() {
   testApp('tabs switch between the four main screens', (tester) async {
     await pumpApp(tester);
 
-    for (final (label, milestone) in [
-      ('History', 'M6'),
-      ('Summary', 'M7'),
-      ('Setup', 'M8'),
-      ('Today', 'M5'),
+    for (final (label, marker) in [
+      ('History', 'History arrives in M6.'),
+      ('Summary', 'Summary arrives in M7.'),
+      ('Setup', 'Setup arrives in M8.'),
+      ('Today', 'Logged today'),
     ]) {
       await tester.tap(tab(label));
       await tester.pumpAndSettle();
-      expect(find.text('$label arrives in $milestone.'), findsOneWidget);
+      expect(find.text(marker), findsOneWidget);
     }
   });
 

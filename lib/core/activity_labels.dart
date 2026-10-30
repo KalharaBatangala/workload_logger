@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../core/format.dart';
-import '../../domain/activity_catalogue.dart';
-import '../../domain/enums.dart';
-import '../../domain/rates.dart';
+import 'format.dart';
+import '../domain/activity_catalogue.dart';
+import '../domain/enums.dart';
+import '../domain/rates.dart';
 
 /// Words and icons for activities, types and counts (SPEC §5, §8.3, §8.4).
 abstract final class ActivityLabels {

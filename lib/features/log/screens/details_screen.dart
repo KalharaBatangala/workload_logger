@@ -16,7 +16,7 @@ import '../../../core/widgets/step_header.dart';
 import '../../../data/providers.dart';
 import '../../../domain/activity_catalogue.dart';
 import '../../../domain/entry_validation.dart';
-import '../activity_labels.dart';
+import '../../../core/activity_labels.dart';
 import '../credit_explanation.dart';
 import '../providers.dart';
 
@@ -45,7 +45,14 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
     final ok = await ref.read(logFlowProvider.notifier).save();
     if (!mounted) return;
     setState(() => _saving = false);
-    if (ok) context.go(AppRoutes.logSaved);
+    if (!ok) return;
+    if (ref.read(logFlowProvider).isEditing) {
+      final messenger = ScaffoldMessenger.of(context);
+      context.pop();
+      messenger.showSnackBar(const SnackBar(content: Text('Entry updated')));
+    } else {
+      context.go(AppRoutes.logSaved);
+    }
   }
 
   Future<void> _pickSpent(int? current) async {
@@ -173,7 +180,12 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
                   AppSpacing.xxl,
                 ),
                 children: [
-                  StepHeader(step: 3, onLeading: () => context.pop()),
+                  StepHeader(
+                    step: 3,
+                    title: state.isEditing ? 'Edit entry' : 'Log work',
+                    showProgress: !state.isEditing,
+                    onLeading: () => context.pop(),
+                  ),
                   const SizedBox(height: AppSpacing.l),
                   Row(
                     children: [

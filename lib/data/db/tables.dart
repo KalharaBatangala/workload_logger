@@ -183,3 +183,16 @@ class Periods extends Table {
   TextColumn get endDate => text()();
   DateTimeColumn get lockedAt => dateTime().nullable()();
 }
+
+/// Answers to Today's timetable cards (schema v2): "Yes" or "No" for a slot
+/// on a date, so an answered card stays away for that day.
+@DataClassName('TimetableAnswer')
+class TimetableAnswers extends Table {
+  TextColumn get date => text()();
+  IntColumn get slotId =>
+      integer().references(TimetableSlots, #id, onDelete: KeyAction.cascade)();
+  TextColumn get answer => textEnum<SlotAnswer>()();
+
+  @override
+  Set<Column> get primaryKey => {date, slotId};
+}

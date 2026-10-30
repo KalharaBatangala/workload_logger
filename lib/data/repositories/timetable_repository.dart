@@ -48,4 +48,22 @@ class TimetableRepository {
 
   Future<void> remove(int id) =>
       (_db.delete(_db.timetableSlots)..where((s) => s.id.equals(id))).go();
+
+  // Answers to Today's timetable cards.
+
+  /// Slot id → answer, for one date.
+  Stream<Map<int, SlotAnswer>> watchAnswers(String date) =>
+      (_db.select(_db.timetableAnswers)..where((a) => a.date.equals(date)))
+          .watch()
+          .map((rows) => {for (final row in rows) row.slotId: row.answer});
+
+  Future<void> answer(String date, int slotId, SlotAnswer answer) => _db
+      .into(_db.timetableAnswers)
+      .insertOnConflictUpdate(
+        TimetableAnswer(date: date, slotId: slotId, answer: answer),
+      );
+
+  Future<void> clearAnswer(String date, int slotId) => (_db.delete(
+    _db.timetableAnswers,
+  )..where((a) => a.date.equals(date) & a.slotId.equals(slotId))).go();
 }

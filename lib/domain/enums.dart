@@ -109,3 +109,6 @@ enum ReminderKind { evening, morning, weekly, submission }
 
 /// The user's answer for a day with nothing logged (SPEC §6).
 enum DayReviewStatus { nothingToLog, reviewed }
+
+/// The answer to a timetable suggestion card on Today (SPEC §8.1).
+enum SlotAnswer { yes, no }

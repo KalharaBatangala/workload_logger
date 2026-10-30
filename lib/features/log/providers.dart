@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../data/repositories/periods_repository.dart';
 import '../../data/repositories/role_rows_repository.dart';
@@ -94,11 +96,6 @@ final likelyActivityProvider = FutureProvider.autoDispose
       return (roleRowId: last.roleRowId!, activity: last.activity);
     });
 
-/// The current rates (defaults until the stream delivers).
-final currentRatesProvider = Provider<RateSet>(
-  (ref) => ref.watch(rateSetProvider).value ?? RateSet.defaults(),
-);
-
 // ---------------------------------------------------------------------------
 // Flow state
 
@@ -129,6 +126,7 @@ class LogFlowState {
     this.photoPaths = const [],
     this.saved,
     this.error,
+    this.editingId,
   });
 
   /// `yyyy-MM-dd`.
@@ -157,6 +155,11 @@ class LogFlowState {
 
   /// A plain message when saving failed.
   final String? error;
+
+  /// Id of the entry being edited; null when logging a new one.
+  final String? editingId;
+
+  bool get isEditing => editingId != null;
 
   CountKind? get countKind =>
       activity == null ? null : countKindFor(activity!, subtype);
@@ -207,6 +210,7 @@ class LogFlowState {
     List<String>? photoPaths,
     Object? saved = _unset,
     Object? error = _unset,
+    Object? editingId = _unset,
   }) => LogFlowState(
     date: date ?? this.date,
     moduleCode: moduleCode == _unset ? this.moduleCode : moduleCode as String?,
@@ -227,6 +231,7 @@ class LogFlowState {
     photoPaths: photoPaths ?? this.photoPaths,
     saved: saved == _unset ? this.saved : saved as SavedEntry?,
     error: error == _unset ? this.error : error as String?,
+    editingId: editingId == _unset ? this.editingId : editingId as String?,
   );
 }
 
@@ -339,20 +344,41 @@ class LogFlowController extends Notifier<LogFlowState> {
     if (activity == null) return false;
     final complete = s.isComplete;
     final note = s.note.trim();
+    final count = s.count > 0 ? s.count : null;
+    final qpp = s.needsQpp ? s.questionsPerPaper : null;
+    final status = complete ? EntryStatus.complete : EntryStatus.draft;
+    final entries = ref.read(entriesRepositoryProvider);
     try {
-      final id = await ref
-          .read(entriesRepositoryProvider)
-          .add(
-            roleRowId: s.roleRowId,
+      final String id;
+      final editingId = s.editingId;
+      if (editingId != null) {
+        final existing = await entries.byId(editingId);
+        if (existing == null) return false;
+        await entries.save(
+          existing.copyWith(
             date: s.date,
-            activity: activity,
-            subtype: s.subtype,
-            count: s.count > 0 ? s.count : null,
-            questionsPerPaper: s.needsQpp ? s.questionsPerPaper : null,
-            spentMinutes: s.spentMinutes,
-            note: note.isEmpty ? null : note,
-            status: complete ? EntryStatus.complete : EntryStatus.draft,
-          );
+            subtype: Value(s.subtype),
+            count: Value(count),
+            questionsPerPaper: Value(qpp),
+            spentMinutes: Value(s.spentMinutes),
+            note: Value(note.isEmpty ? null : note),
+            status: status,
+          ),
+        );
+        id = editingId;
+      } else {
+        id = await entries.add(
+          roleRowId: s.roleRowId,
+          date: s.date,
+          activity: activity,
+          subtype: s.subtype,
+          count: count,
+          questionsPerPaper: qpp,
+          spentMinutes: s.spentMinutes,
+          note: note.isEmpty ? null : note,
+          status: status,
+        );
+      }
       await _storePhotos(id, s.photoPaths);
       state = s.copyWith(
         saved: SavedEntry(id: id, isDraft: !complete),
@@ -367,6 +393,47 @@ class LogFlowController extends Notifier<LogFlowState> {
       );
       return false;
     }
+  }
+
+  /// Fills the flow from an existing entry so Step 3 can edit it.
+  void loadEntry(EntryRow entry, RoleRow? row) {
+    final info = row?.toInfo();
+    final option = info == null
+        ? null
+        : activitiesFor(info)
+              .where((o) => o.activity == entry.activity)
+              .firstOrNull;
+    state = LogFlowState(
+      date: entry.date,
+      moduleCode: row?.moduleCode,
+      batch: row?.batch,
+      roleRowId: entry.roleRowId,
+      roleRow: info,
+      activity: entry.activity,
+      subtypes: option?.subtypes ?? [if (entry.subtype != null) entry.subtype!],
+      subtype: entry.subtype,
+      count: entry.count ?? 0,
+      questionsPerPaper: entry.questionsPerPaper,
+      spentMinutes: entry.spentMinutes,
+      note: entry.note ?? '',
+      editingId: entry.id,
+    );
+  }
+
+  /// Starts Step 3 for a lecture on [row] (Today's "Other hours").
+  Future<void> startLecture(RoleRow row) async {
+    final info = row.toInfo();
+    state = LogFlowState(
+      date: state.date,
+      moduleCode: row.moduleCode,
+      batch: row.batch,
+    );
+    await chooseActivity(
+      roleRowId: row.id,
+      roleRow: info,
+      option: activitiesFor(info)
+          .firstWhere((o) => o.activity == Activity.lecture),
+    );
   }
 
   Future<void> _storePhotos(String entryId, List<String> paths) async {

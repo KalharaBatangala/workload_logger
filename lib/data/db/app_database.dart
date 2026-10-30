@@ -3,6 +3,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 import '../../domain/enums.dart';
 import '../../domain/rates.dart';
+import 'app_database.steps.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
@@ -31,6 +32,7 @@ const defaultOtherCategories = [
     DayReviews,
     PgSupervision,
     Periods,
+    TimetableAnswers,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -42,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
       AppDatabase(driftDatabase(name: 'workload_logger'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -50,6 +52,13 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
       await _seedDefaults();
     },
+    // One step per schema version; drift checks each against its saved
+    // schema in test/data/drift/.
+    onUpgrade: stepByStep(
+      from1To2: (m, schema) async {
+        await m.createTable(schema.timetableAnswers);
+      },
+    ),
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },

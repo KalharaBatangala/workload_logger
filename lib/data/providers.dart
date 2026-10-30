@@ -189,3 +189,8 @@ final totalsProvider = FutureProvider<Totals>((ref) async {
     ),
   );
 });
+
+/// The current rates, as a plain value (defaults until the stream delivers).
+final currentRatesProvider = Provider<RateSet>(
+  (ref) => ref.watch(rateSetProvider).value ?? RateSet.defaults(),
+);
