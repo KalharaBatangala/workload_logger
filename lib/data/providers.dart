@@ -17,6 +17,7 @@ import 'repositories/rates_repository.dart';
 import 'repositories/reminder_settings_repository.dart';
 import 'repositories/role_rows_repository.dart';
 import 'repositories/timetable_repository.dart';
+import 'workbook/import_service.dart';
 
 // ---------------------------------------------------------------------------
 // Infrastructure (overridden in tests)
@@ -88,6 +89,11 @@ final pgSupervisionRepositoryProvider = Provider(
 final demoSeederProvider = Provider(
   (ref) =>
       DemoSeeder(ref.watch(databaseProvider), now: ref.watch(clockProvider)),
+);
+
+final importServiceProvider = Provider(
+  (ref) =>
+      ImportService(ref.watch(databaseProvider), now: ref.watch(clockProvider)),
 );
 
 // ---------------------------------------------------------------------------

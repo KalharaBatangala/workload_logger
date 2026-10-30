@@ -12,6 +12,10 @@ class ReminderSettingsRepository {
       .watch()
       .map((rows) => {for (final row in rows) row.key: row});
 
+  Future<ReminderSetting?> byKey(ReminderKind key) => (_db.select(
+    _db.reminderSettings,
+  )..where((r) => r.key.equalsValue(key))).getSingleOrNull();
+
   Future<void> save(ReminderSetting setting) =>
       _db.into(_db.reminderSettings).insertOnConflictUpdate(setting);
 }

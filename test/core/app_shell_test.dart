@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:workload_logger/app.dart';
 import 'package:workload_logger/core/widgets/app_scaffold.dart';
 
-void main() {
-  Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(const ProviderScope(child: App()));
-    await tester.pumpAndSettle();
-  }
+import '../app_harness.dart';
 
+void main() {
   Finder tab(String label) => find.descendant(
     of: find.byType(AppBottomBar),
     matching: find.text(label),
   );
 
-  testWidgets('starts on Today with the bottom bar', (tester) async {
+  testApp('starts on Today with the bottom bar', (tester) async {
     await pumpApp(tester);
 
     expect(find.text('Today arrives in M5.'), findsOneWidget);
@@ -25,7 +20,7 @@ void main() {
     }
   });
 
-  testWidgets('tabs switch between the four main screens', (tester) async {
+  testApp('tabs switch between the four main screens', (tester) async {
     await pumpApp(tester);
 
     for (final (label, milestone) in [
@@ -40,7 +35,7 @@ void main() {
     }
   });
 
-  testWidgets('Log opens full screen without the bottom bar and closes', (
+  testApp('Log opens full screen without the bottom bar and closes', (
     tester,
   ) async {
     await pumpApp(tester);
@@ -57,7 +52,7 @@ void main() {
     expect(find.byType(AppBottomBar), findsOneWidget);
   });
 
-  testWidgets('the raised part of the Log button is tappable', (tester) async {
+  testApp('the raised part of the Log button is tappable', (tester) async {
     await pumpApp(tester);
     final button = tester.getRect(find.byKey(const Key('logButton')));
     final barTop = tester.getRect(find.byType(AppBottomBar)).top;

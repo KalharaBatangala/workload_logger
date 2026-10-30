@@ -30,3 +30,12 @@ String addDays(String date, int days) {
 /// Monday of the week containing [date] (weeks run Monday–Sunday).
 String weekStart(String date) =>
     addDays(date, -(parseIsoDate(date).weekday - DateTime.monday));
+
+/// A label such as "2025/26" for the academic year that [date] most likely
+/// falls in. Only a starting suggestion for the user to edit: the exact
+/// academic-year boundaries are an open question (SPEC §14), so this simply
+/// assumes years start in August.
+String suggestedAcademicYearLabel(DateTime date) {
+  final start = date.month >= DateTime.august ? date.year : date.year - 1;
+  return '$start/${((start + 1) % 100).toString().padLeft(2, '0')}';
+}

@@ -35,11 +35,11 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] Repository tests on an in-memory database
 
 ### M3 · Workbook import + onboarding
-- [ ] Import service: rates by label (SPEC §3.1), staff list, role rows, PG count, opening balances
-- [ ] Graceful handling of known issues (SPEC §3.5); rate warnings collected
-- [ ] Onboarding screens (SPEC §8.9): welcome → load workbook → pick name → reminder time → Today
-- [ ] "Try with demo data" path
-- [ ] Test: importing `docs/reference/DEIE_Workload_Model_V10_1.xlsx` gives 8 rows and 78.7 h
+- [x] Import service: rates by label (SPEC §3.1), staff list, role rows, PG count, opening balances
+- [x] Graceful handling of known issues (SPEC §3.5); rate warnings collected
+- [x] Onboarding screens (SPEC §8.9): welcome → load workbook → pick name → reminder time → Today
+- [x] "Try with demo data" path
+- [x] Test: importing `docs/reference/DEIE_Workload_Model_V10_1.xlsx` gives 8 rows and 78.7 h
 
 ### M4 · Logging flow
 - [ ] StepHeader, ActivityTile, SegmentedChoice, CountStepper, CreditStrip, DateChips widgets

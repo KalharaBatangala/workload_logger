@@ -30,6 +30,10 @@ extension ReadNow on ProviderContainer {
   /// Reads an async provider's value. Riverpod 3 pauses providers that
   /// nobody listens to, so listen for the duration of the read (as a screen
   /// would with `ref.watch`).
+  ///
+  /// Caveat: a provider read earlier and then paused may return its old
+  /// value. After writes, either keep a listener open (see `settle`) or read
+  /// the repository directly.
   Future<T> readNow<T>(ProviderListenable<Future<T>> provider) async {
     final sub = listen(provider, (_, _) {});
     try {
