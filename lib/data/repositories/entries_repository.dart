@@ -138,6 +138,10 @@ class EntriesRepository {
   Stream<List<EntryRow>> watchDrafts() =>
       _watch((e) => e.status.equalsValue(EntryStatus.draft));
 
+  /// One-off read of a role row's entries (for the save warnings).
+  Future<List<EntryRow>> getForRoleRow(int roleRowId) =>
+      _query((e) => e.roleRowId.equals(roleRowId)).get();
+
   Stream<List<EntryRow>> watchForRoleRow(int roleRowId) =>
       _watch((e) => e.roleRowId.equals(roleRowId));
 

@@ -45,9 +45,11 @@ class TimetableCardView extends StatelessWidget {
                 color: AppColors.goldText,
               ),
               const SizedBox(width: AppSpacing.s),
-              Text(
-                'FROM YOUR TIMETABLE',
-                style: AppText.overline.copyWith(color: AppColors.goldText),
+              Flexible(
+                child: Text(
+                  'FROM YOUR TIMETABLE',
+                  style: AppText.overline.copyWith(color: AppColors.goldText),
+                ),
               ),
             ],
           ),

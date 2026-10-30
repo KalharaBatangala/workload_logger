@@ -98,7 +98,7 @@ class TodayScreen extends ConsumerWidget {
               ),
               IconButton.outlined(
                 tooltip: 'Reminder settings',
-                onPressed: () => context.go(AppRoutes.setup),
+                onPressed: () => context.go(AppRoutes.setupReminders),
                 style: IconButton.styleFrom(
                   backgroundColor: AppColors.surface,
                   minimumSize: const Size(48, 48),

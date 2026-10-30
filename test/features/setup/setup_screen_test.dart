@@ -139,4 +139,25 @@ void main() {
     await tapOn(tester, find.text('Keep'));
     expect(find.text('Workbook loaded: 8 role rows'), findsWidgets);
   });
+
+  testApp('Today\'s bell opens Setup at Reminders', (tester) async {
+    await pumpApp(tester, demo: true);
+    await tester.tap(find.byTooltip('Reminder settings'));
+    await settle(tester);
+    // Visible without scrolling by hand.
+    expect(find.text('Evening check-in').hitTestable(), findsOneWidget);
+  });
+
+  testApp('submission reminder: change date, then clear it', (tester) async {
+    await pumpApp(tester, demo: true);
+    await openSetup(tester);
+    await tapOn(tester, find.text('Before submission'));
+    await tapOn(tester, find.text('Change submission date'));
+    await tapOn(tester, find.text('OK'));
+    await reveal(tester, find.text('Thu 29 Oct'));
+
+    await tapOn(tester, find.text('Before submission'));
+    await tapOn(tester, find.text('Clear submission date'));
+    await reveal(tester, find.text('Not set'));
+  });
 }
