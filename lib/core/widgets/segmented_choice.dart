@@ -66,7 +66,7 @@ class _Segment extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppRadii.buttonSmall),
           child: SizedBox(
-            height: AppSpacing.minTouchTarget,
+            height: 48, // Android's tap-target guideline
             child: Center(
               child: FittedBox(
                 fit: BoxFit.scaleDown,

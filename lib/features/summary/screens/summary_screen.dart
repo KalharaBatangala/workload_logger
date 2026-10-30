@@ -249,13 +249,22 @@ class _RoleRowLineTile extends StatelessWidget {
                   style: AppText.bodySmall,
                 ),
               ),
-              if (line.nothingYet)
-                const StatusPill('Nothing yet')
-              else
-                Text(
-                  formatHours(line.hours),
-                  style: AppText.body.copyWith(fontWeight: FontWeight.w800),
+              const SizedBox(width: AppSpacing.s),
+              // Scales down rather than overflows with large system text.
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: line.nothingYet
+                      ? const StatusPill('Nothing yet')
+                      : Text(
+                          formatHours(line.hours),
+                          style: AppText.body.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                 ),
+              ),
             ],
           ),
         ),

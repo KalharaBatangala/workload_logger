@@ -21,11 +21,45 @@ const appVersion = '1.0.0';
 
 /// Setup (SPEC §8.8). The BACKUP section of the design is phase 2 (SPEC §15)
 /// and is not shown.
-class SetupScreen extends ConsumerWidget {
-  const SetupScreen({super.key});
+class SetupScreen extends ConsumerStatefulWidget {
+  const SetupScreen({super.key, this.focusReminders = false});
+
+  /// Scroll to the Reminders section (Today's bell).
+  final bool focusReminders;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SetupScreen> createState() => _SetupScreenState();
+}
+
+class _SetupScreenState extends ConsumerState<SetupScreen> {
+  final _remindersKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.focusReminders) _scrollToReminders();
+  }
+
+  @override
+  void didUpdateWidget(SetupScreen old) {
+    super.didUpdateWidget(old);
+    if (widget.focusReminders && !old.focusReminders) _scrollToReminders();
+  }
+
+  void _scrollToReminders() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final target = _remindersKey.currentContext;
+      if (target != null && target.mounted) {
+        Scrollable.ensureVisible(
+          target,
+          duration: const Duration(milliseconds: 300),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final actions = SetupActions(ref);
     final profile = ref.watch(profileProvider).value;
     final rows = ref.watch(roleRowsProvider).value ?? const <RoleRow>[];
@@ -119,7 +153,7 @@ class SetupScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-        const SectionLabel('Reminders'),
+        SectionLabel('Reminders', key: _remindersKey),
         if (!allowed) ...[
           AppCard(
             color: AppColors.goldTint,

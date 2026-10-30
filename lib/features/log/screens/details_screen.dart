@@ -18,6 +18,7 @@ import '../../../domain/activity_catalogue.dart';
 import '../../../domain/entry_validation.dart';
 import '../../../core/activity_labels.dart';
 import '../credit_explanation.dart';
+import '../warning_text.dart';
 import '../providers.dart';
 
 /// Step 3 — type and count (SPEC §8.4).
@@ -183,6 +184,7 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
     }
 
     final credit = state.creditWith(rates);
+    final warnings = ref.watch(logWarningsProvider).value ?? const [];
     final isHours = kind == CountKind.hours;
 
     return Scaffold(
@@ -372,6 +374,49 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
                             state.error!,
                             style: AppText.bodySmall.copyWith(
                               color: AppColors.error,
+                            ),
+                          ),
+                        ],
+                        // SPEC §12: worth a second look, but Save still works.
+                        if (warnings.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.m),
+                          AppCard(
+                            color: AppColors.goldTint,
+                            borderColor: AppColors.goldBorder,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (final w in warnings)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 2,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.info_outline_rounded,
+                                          size: 18,
+                                          color: AppColors.goldTextDeep,
+                                        ),
+                                        const SizedBox(width: AppSpacing.s),
+                                        Expanded(
+                                          child: Text(
+                                            warningText(
+                                              w,
+                                              moduleCode:
+                                                  state.moduleCode ?? '',
+                                            ),
+                                            style: AppText.bodySmall.copyWith(
+                                              color: AppColors.goldTextDeep,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         ],

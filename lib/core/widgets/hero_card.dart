@@ -64,20 +64,26 @@ class HeroCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.s),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  value,
-                  style: AppText.display.copyWith(color: AppColors.surface),
-                ),
-                const SizedBox(width: AppSpacing.s),
-                Text(
-                  unit,
-                  style: AppText.cardTitle.copyWith(color: AppColors.cream),
-                ),
-              ],
+            // Shrinks rather than overflows with large system text.
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    value,
+                    style: AppText.display.copyWith(color: AppColors.surface),
+                  ),
+                  const SizedBox(width: AppSpacing.s),
+                  Text(
+                    unit,
+                    style: AppText.cardTitle.copyWith(color: AppColors.cream),
+                  ),
+                ],
+              ),
             ),
             if (footnote != null) ...[
               const SizedBox(height: AppSpacing.xs),

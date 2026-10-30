@@ -36,6 +36,7 @@ abstract final class AppRoutes {
   static const logSaved = '/log/saved';
   static const logOther = '/log/other';
   static const setupRates = '/setup/rates';
+  static const setupReminders = '/setup?section=reminders';
   static const setupCategories = '/setup/categories';
   static String logOn(String date) => '/log?date=$date';
   static String summaryRow(int roleRowId) => '/summary/row/$roleRowId';
@@ -118,6 +119,11 @@ GoRouter createRouter({
           _branch(
             AppRoutes.setup,
             const SetupScreen(),
+            // Today's bell opens /setup?section=reminders.
+            builder: (context, state) => SetupScreen(
+              focusReminders:
+                  state.uri.queryParameters['section'] == 'reminders',
+            ),
             routes: [
               GoRoute(
                 path: 'rates',
@@ -241,10 +247,15 @@ StatefulShellBranch _branch(
   String path,
   Widget screen, {
   List<RouteBase> routes = const [],
+  GoRouterWidgetBuilder? builder,
 }) {
   return StatefulShellBranch(
     routes: [
-      GoRoute(path: path, builder: (context, state) => screen, routes: routes),
+      GoRoute(
+        path: path,
+        builder: builder ?? (context, state) => screen,
+        routes: routes,
+      ),
     ],
   );
 }

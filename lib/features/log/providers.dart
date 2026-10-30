@@ -12,6 +12,7 @@ import '../../data/repositories/role_rows_repository.dart';
 import '../../domain/activity_catalogue.dart';
 import '../../domain/credit_calculator.dart';
 import '../../domain/entry_validation.dart';
+import '../../domain/entry_warnings.dart';
 import '../../domain/enums.dart';
 import '../../domain/module_groups.dart';
 import '../../domain/rates.dart';
@@ -510,3 +511,64 @@ final logFlowProvider =
 final otherCategoriesProvider = StreamProvider.autoDispose(
   (ref) => ref.watch(otherWorkRepositoryProvider).watchCategories(),
 );
+
+/// SPEC §12 warnings for what Step 3 would save (never blocking). Only
+/// re-checked when one of the fields that matter changes.
+final logWarningsProvider = FutureProvider.autoDispose<List<EntryWarning>>((
+  ref,
+) async {
+  final (
+    rowId,
+    activity,
+    subtype,
+    date,
+    count,
+    editingId,
+    students,
+    readOnly,
+  ) = ref.watch(
+    logFlowProvider.select(
+      (s) => (
+        s.roleRowId,
+        s.activity,
+        s.subtype,
+        s.date,
+        s.count,
+        s.editingId,
+        s.roleRow?.students ?? 0,
+        s.readOnly,
+      ),
+    ),
+  );
+  if (rowId == null || activity == null || count <= 0 || readOnly) {
+    return const [];
+  }
+  final entries = await ref
+      .read(entriesRepositoryProvider)
+      .getForRoleRow(rowId);
+  return entryWarnings(
+    candidate: WarningEntry(
+      id: editingId,
+      roleRowId: rowId,
+      activity: activity,
+      subtype: subtype,
+      date: date,
+      count: count,
+    ),
+    existing: [
+      for (final e in entries)
+        WarningEntry(
+          id: e.id,
+          roleRowId: rowId,
+          activity: e.activity,
+          subtype: e.subtype,
+          date: e.date,
+          count: e.count ?? 0,
+          createdAt: e.createdAt,
+          isComplete: e.status == EntryStatus.complete,
+        ),
+    ],
+    students: students,
+    now: ref.read(clockProvider)(),
+  );
+});

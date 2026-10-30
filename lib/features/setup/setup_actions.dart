@@ -191,9 +191,52 @@ class SetupActions {
   /// the date, for the submission one).
   Future<void> editReminder(BuildContext context, ReminderSetting s) async {
     if (s.key == ReminderKind.submission) {
-      await editSubmissionDate(context);
-      return;
+      final profile = await ref.read(profileRepositoryProvider).get();
+      if (!context.mounted) return;
+      final choice = await showModalBottomSheet<String>(
+        context: context,
+        // Above the bottom bar, not inside the tab.
+        useRootNavigator: true,
+        showDragHandle: true,
+        builder: (context) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.event_outlined),
+                title: const Text('Change submission date'),
+                onTap: () => Navigator.pop(context, 'date'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.schedule_outlined),
+                title: const Text('Change reminder time'),
+                onTap: () => Navigator.pop(context, 'time'),
+              ),
+              if (profile?.submissionDate != null)
+                ListTile(
+                  leading: const Icon(Icons.event_busy_outlined),
+                  title: const Text('Clear submission date'),
+                  onTap: () => Navigator.pop(context, 'clear'),
+                ),
+            ],
+          ),
+        ),
+      );
+      if (!context.mounted) return;
+      switch (choice) {
+        case 'date':
+          await editSubmissionDate(context);
+          return;
+        case 'clear':
+          await clearSubmissionDate();
+          return;
+        case 'time':
+          break; // fall through to the time picker below
+        default:
+          return;
+      }
     }
+    if (!context.mounted) return;
     final parts = s.time.split(':');
     final time = await showTimePicker(
       context: context,

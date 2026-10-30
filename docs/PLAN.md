@@ -77,9 +77,9 @@ runs on the Android phone · boxes ticked · git commit.
 - [x] Android 13 notification permission flow; reschedule on start, settings change and save
 
 ### M9 · Polish and release
-- [ ] Accessibility pass (labels, 44 dp targets, text scaling to 1.3×)
-- [ ] Validation warnings (SPEC §12)
-- [ ] Final launcher icon and splash in navy/gold
+- [x] Accessibility pass (labels, 44 dp targets, text scaling to 1.3×)
+- [x] Validation warnings (SPEC §12)
+- [x] Final launcher icon and splash in navy/gold
 - [ ] `flutter build apk --release`, install on the phone, one week of real use
 
 ## Phase 2 — Smarter capture
